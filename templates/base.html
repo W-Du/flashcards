@@ -1,0 +1,30 @@
+<html>
+    <head>
+    
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>flashcards</title>
+    </head>
+
+    <body>
+          
+        <hr>
+        {% with flashs = get_flashed_messages() %}
+        {% if flashs %}
+        <ul>
+            {% for f in flashs %}
+            <p>{{ f }}</p>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+
+        {% block content %}{% endblock %}
+
+
+        {% if message %}
+        <span style="color:red">{{ message }}</span>
+        {% endif %}
+    </body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ user.username }}'s Setting</h1>
+
+<nav>
+    <a href="/user/{{ user.username }}">Back</a>
+</nav>
+
+<h2>Overview</h2>
+
+<!-- list -->
+<h3>My lists</h3>
+{% if user.lists | length > 0 %}
+{% for l in user.lists %}
+<p>
+    {{ l.listname }} &emsp; has {{ l.words | length }} words
+</p>
+{% endfor %}
+{% else %}
+<p>You have no list yet. Create one with form below</p>
+{% endif %}
+<br>
+
+<form id='list', action="/user/{{ user.username }}/setting", method='POST'>
+    {{ formList.hidden_tag() }}
+    <input type="hidden" name="form_id" value="list">
+    <p>
+        {{ formList.listname.label }}<br>
+        {{ formList.listname(size=32) }}<br>
+        {% for error in formList.listname.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ formList.submit() }}
+    </p>
+</form>
+<br><br>
+
+<!-- goal -->
+<h3>My daily goal:</h3>
+{% if user.daily_goal %}
+<p>{{ user.daily_goal }}</p>
+{% else %}
+<p>You have not set the daily goal yet.</p>
+{% endif %}
+
+<form id='goal', action="/user/{{ user.username }}/setting", method="POST">
+    {{ formGoal.hidden_tag() }}
+    <input type="hidden" name="form_id" value="goal">
+    <p>
+        {{ formGoal.goal.label }}<br>
+        {{ formGoal.goal(size = 64) }}<br>
+        {% for error in formGoal.goal.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ formGoal.submit() }}
+    </p>
+</form>
+<br><br>
+
+<h3>I have {{ user.words | length }} flashcards. </h3>
+
+
+
+{% endblock %}

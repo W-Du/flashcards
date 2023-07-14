@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ user.username }}'s Homepage</h1>
+
+<a href="/user/{{ user.username }}/practice">Practice</a>
+<a href="/user/{{ user.username }}/setting">Setting</a>
+<a href="/user/{{ user.username }}/add-card">Create new flashcards</a>
+<a href="/logout">Log Out</a>
+
+
+{% endblock %}

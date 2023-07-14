@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Practice</h1>
+
+<nav>
+    {% if current_user.is_authenticated %}
+    <a href="/user/{{ user.username }}">Home</a>
+    {% else %}
+    <a href="/home">Home</a>
+    {% endif %}
+</nav>
+
+{% if cur_word %}
+<h3>{{ cur_word.word }}</h3>
+<p>{{ cur_word.description }}</p>
+<p>[{{ cur_word.priority }}]</p>
+{% else %}
+<p>no word</p>
+{% endif %}
+
+
+<!-- <form action="/user/{{ user.username }}/word-priority", method="POST">
+    <input type="hidden", name="word_id", value="{{ cur_word.id }}">
+    <input type="hidden", name="action", id="action">
+    
+    <p>
+        <input type="submit", onclick="setAction('remember')", value="I got this">
+        <input type="submit", onclick="setAction('not_remember')", value="No clue">
+    </p>
+    
+</form> -->
+
+
+
+<button id="not_remember", 
+data-current-index="{{ cur_word_idx }}", 
+data-length="{{ length }}", 
+word_id="{{ cur_word.id }}">No clue</button>
+
+<button id="remember", 
+data-current-index="{{ cur_word_idx }}", 
+data-length="{{ length }}", 
+word_id="{{ cur_word.id}}">Got this</button>
+
+<script>
+    document.getElementById('not_remember').addEventListener('click', function() {
+        var currentIndex = parseInt(this.getAttribute('data-current-index'));
+        var count = parseInt(this.getAttribute('data-length'));
+        var wordId = parseInt(this.getAttribute('word_id'));
+        updateFlashcard(currentIndex, count, wordId, 'not_remember');
+    });
+
+    document.getElementById('remember').addEventListener('click', function() {
+        var currentIndex = parseInt(this.getAttribute('data-current-index'));
+        var count = parseInt(this.getAttribute('data-length'));
+        var wordId = parseInt(this.getAttribute('word_id'));
+        updateFlashcard(currentIndex, count, wordId, 'remember');
+
+    });
+
+    function updateFlashcard(currentIndex, count, wordId, action) {
+        console.log(count)
+        var form = document.createElement('form');
+        form.action = "/user/{{ user.username }}/word-priority";
+        form.method = 'POST';
+
+        var wordIdInput = document.createElement('input');
+        wordIdInput.type = 'hidden';
+        wordIdInput.name = 'word_id';
+        wordIdInput.value = Number(wordId);
+
+        var actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = action;
+
+        var indexInput = document.createElement('input');
+        indexInput.type = 'hidden';
+        indexInput.name = 'index';
+        indexInput.value = currentIndex;
+
+        form.appendChild(wordIdInput);
+        form.appendChild(actionInput);
+        form.appendChild(indexInput);
+        document.body.appendChild(form);
+
+        form.submit();
+        console.log('formsubmited')
+
+        // currentIndex++;
+        // if (currentIndex >= count) {
+        //     window.location.href = '/user/{{ user.username }}/goal'
+        // }
+        // window.location.href = '/user/{{ user.username }}/practice?index=' + currentIndex;
+    }
+
+</script>
+
+
+
+{% endblock %}
