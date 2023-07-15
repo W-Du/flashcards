@@ -1,0 +1,36 @@
+{% extends '_toggle.html' %}
+{% block toggle %}
+
+<h1>Vocabulary List - {{ lst.listname }}</h1>
+
+<nav>
+    <a href="/user/{{ user.username }}/setting">Setting</a>
+</nav><br><br>
+
+
+<button id="toggle-form">A new name for the list?</button>
+<form id="change-list-name" style="display: none" method="POST" action="/user/{{ user.username }}/setting/lists/{{ lst.id }}">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.listname.label }}
+        {{ form.listname(size=32, value = lst.listname)}}
+    </p>
+    <p> {{ form.submit() }} </p>
+</form>
+
+<h3>Words in {{ lst.listname }}</h3>
+
+{% for w in words %}
+<a href="/user/{{ user.username }}/setting/flashcards/{{ w.id }}?list={{ lst.id }}">{{ w.word }}</a>
+{% endfor %}
+
+
+
+<script>
+    document.getElementById('toggle-form').addEventListener('click', () => {
+        toggleForm('change-list-name');
+    })
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% block toggle %}{% endblock %}
+
+<script>
+    const toggleForm = (formId) => {
+        const form = document.getElementById(formId);
+        if (form.style.display === 'none'){
+            form.style.display = 'block'
+        } else {
+            form.style.display = 'none'
+        }
+    }
+
+    const goBack = () => {
+        window.history.back();
+    }
+</script>
+
+{% endblock %}

@@ -21,9 +21,15 @@ def register():
     if form.validate_on_submit():
         emailInput = form.email.data
         emailExists = User.query.filter_by(email = emailInput).first()
-        if(emailExists):
-            msg = "Email already registered"
-            form.username.data = None
+        usernameInput = form.username.data
+        usernameExists = User.query.filter_by(username=usernameInput).first()
+        if(emailExists or usernameExists):
+            if(emailExists):
+                msg = "Email already registered"
+                form.username.data = None
+            else:
+                msg = 'Username is taken'
+                form.username.data = None
             return render_template('register.html', form=form, message=msg)
         new_user = User(username = form.username.data, email = form.email.data)
         new_user.set_password(form.password.data)
