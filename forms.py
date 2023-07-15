@@ -36,10 +36,18 @@ class ChangeDailyGoalForm(FlaskForm):
     goal = IntegerField('Daily Goal', validators=[DataRequired()])
     submit = SubmitField('Update')
 
-class WordPriorityForm(FlaskForm):
-    remember = SubmitField('I got this')
-    not_remember = SubmitField('Do not have a clue')
+# class WordPriorityForm(FlaskForm):
+#     remember = SubmitField('I got this')
+#     not_remember = SubmitField('Do not have a clue')
 
+class UpdateListForm(FlaskForm):
+    listname = StringField('Name of List', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+class UpdateWordForm(FlaskForm):
+    word= StringField('Word', validators=[DataRequired()])
+    description = StringField('Meaning', validators=[DataRequired()])
+    submit = SubmitField('Update')
 
 
 
