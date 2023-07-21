@@ -1,47 +1,64 @@
 {% extends '_toggle.html' %}
 
 {% block toggle %}
+
 <h1>Flashcard - {{ word.word }}</h1>
+
 <nav>
-    {% if request.args.get('list') %}
-    <a href="/user/{{ user.username }}/setting/lists/{{ request.args.get('list') }}">Back</a>
-    {% elif lst_idx %}
+    {% if lst_idx %}
     <a href="/user/{{ user.username }}/setting/lists/{{ lst_idx }}">Back</a>
     {% else %}
-    <a href="/user/{{ user.username }}/setting">Back</a>
+    <a href="/user/{{ user.username }}/flashcards">Back</a>
     {% endif %}
+
 </nav>
 
 <p>Meaning: {{ word.description }}</p>
 
 <button id="toggle-form">Edit flashcard</button>
-<form style="display:none", id="edit-flashcard", method="POST", action="/user/{{ user.username }}/setting/flashcards/{{ word.id }}?list={{request.args.get('list')}}">
+<form style="display:none", id="edit-flashcard", method="POST", action="/user/{{ user.username }}/flashcards/{{ word.id }}">
     {{ form.hidden_tag() }}
+    {% if lst_idx %}
+    <input type="hidden", name="lst_id", value="{{ lst_idx }}">
+    {% endif %}
+
     <p>
         {{ form.word.label }}<br>
         {{ form.word(size = 64, value = word.word) }}
+        {% for error in form.word.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
     </p>
     <p> 
         {{ form.description.label }}<br>
         {{ form.description(size=64, value = word.description) }}
+        {% for error in form.description.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.Inlists.label }}<br>
+        {{ form.Inlists() }}
+        {% for error in form.Inlists.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
     </p>
     <p> {{ form.submit() }}</p>
 </form>
 
-<form style="display: none", id="delete-flashcard", method='POST', action="/user/{{ user.username }}/setting/flashcards/delete/{{ word.id }}">
-    <input type="hidden", name="lst_id", value="{{ request.args.get('list') or lst_idx }}">
-    <input type="submit", value="Delete">
+
+<form style="display: none", id="delete-flashcard", method='POST', action="/user/{{ user.username }}/flashcards/delete/{{ word.id }}">
+    {% if lst_idx %}
+    <input type="hidden", name="lst_id", value="{{ lst_idx }}">
+    {% endif %}
+    <input type="submit", value="Deletes">
 </form>
-
-
-
 
 <script>
     document.getElementById('toggle-form').addEventListener('click', () => {
         toggleForm('edit-flashcard');
         toggleForm('delete-flashcard');
     })
-
-    
 </script>
+
 {% endblock %}

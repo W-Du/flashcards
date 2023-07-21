@@ -9,7 +9,7 @@
 
 
 <button id="toggle-form">A new name for the list?</button>
-<form id="change-list-name" style="display: none" method="POST" action="/user/{{ user.username }}/setting/lists/{{ lst.id }}">
+<form id="change-list-name" style="display: none" method="POST" action="/user/{{ user.username }}/lists/{{ lst.id }}">
     {{ form.hidden_tag() }}
     <p>
         {{ form.listname.label }}
@@ -18,18 +18,80 @@
     <p> {{ form.submit() }} </p>
 </form>
 
+<form id="delete-list" style="display:none" method="POST" action="/user/{{ user.username }}/lists/delete/{{ lst.id }}">
+    <input type="checkbox" name="delete-all">
+    <label for="delete-all">Delete all words in this list</label>
+    <input type="submit" value="Delete List">
+</form>
+
+<br><br>
+<h3>Add Flashcards</h3>
+<button id="add-word">Create a new Flashcard to {{ lst.listname }}</button>
+<form id="new-flashcard" style="display: none;" method="POST" action='/user/{{ user.username }}/flashcards'>
+    <input type="hidden" name="lst_id" value="{{ lst.id }}">
+    {{ formCard.hidden_tag() }}
+    <p>
+        {{ formCard.word.label }}<br>
+        {{ formCard.word(size = 64) }}<br>
+        {% for error in formCard.word.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ formCard.description.label }}<br>
+        {{ formCard.description(size = 128) }}<br>
+        {% for error in formCard.description.errors %}
+        <span style="color:red">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    {% if current_user.is_authenticated and current_user.lists %}
+    <p>
+        {{ formCard.addToList.label }}<br>
+        {{ formCard.addToList() }}<br>
+    </p>
+    {% endif %}
+    <p>
+        {{ formCard.submit() }}
+
+</form>
+
+<br>
+<form method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+    <input type="hidden" name="action" value="add to">
+    <input type="submit" value="Add existing flashcars to {{ lst.listname }}">
+</form>
+<!-- <a href="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">Add existing flashcars to {{ lst.listname }} </a> -->
+
+
+
 <h3>Words in {{ lst.listname }}</h3>
 
+<div>
 {% for w in words %}
-<a href="/user/{{ user.username }}/setting/flashcards/{{ w.id }}?list={{ lst.id }}">{{ w.word }}</a>
+<a href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}">{{ w.word }}</a>
 {% endfor %}
+</div>
+
+
+<form id="bulk-remove" method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+    <input type="hidden" name="action" value="remove from">
+    <input type="submit" value="Remove flashcards from {{ lst.listname }}">
+</form>
 
 
 
 <script>
     document.getElementById('toggle-form').addEventListener('click', () => {
         toggleForm('change-list-name');
+        toggleForm('delete-list');
     })
+    document.getElementById('add-word').addEventListener('click', ()=>{
+        toggleForm('new-flashcard');
+    })
+    // document.getElementById('remove').addEventListener('click', ()=>{
+    //     toggleForm('bulk-remove');
+    //     toggleForm('cards-link');
+    // })
 </script>
 
 

@@ -14,7 +14,7 @@
 {% if user.lists | length > 0 %}
 {% for l in user.lists %}
 <p>
-    <a href="/user/{{ user.username }}/setting/lists/{{ l.id }}">{{ l.listname }}</a>
+    <a href="/user/{{ user.username }}/lists/{{ l.id }}">{{ l.listname }}</a>
     &emsp; has {{ l.words | length }} words
 </p>
 {% endfor %}
@@ -64,6 +64,7 @@
 <br><br>
 
 <h3>I have {{ user.words | length }} flashcards. </h3>
+<a href="/user/{{ user.username }}/flashcards">See all my flashcards</a>
 
 
 

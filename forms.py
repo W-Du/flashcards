@@ -17,14 +17,14 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField("Remember me")
     submit = SubmitField('Login')
 
-class AddVocabularyForm(FlaskForm):
+class AddFlashcardForm(FlaskForm):
     word = StringField('New Word', validators=[DataRequired()])
     description = TextAreaField('Meanings & Sample Sentences', validators=[DataRequired()])
     addToList = SelectMultipleField('Add to List', coerce=int)
     submit = SubmitField('Add new word')
 
     def __init__(self, *args, **kwargs):
-        super(AddVocabularyForm, self).__init__(*args, **kwargs)
+        super(AddFlashcardForm, self).__init__(*args, **kwargs)
         if current_user.is_authenticated:
             self.addToList.choices = [(l.id, l.listname) for l in current_user.lists]
 
@@ -47,10 +47,34 @@ class UpdateListForm(FlaskForm):
 class UpdateWordForm(FlaskForm):
     word= StringField('Word', validators=[DataRequired()])
     description = StringField('Meaning', validators=[DataRequired()])
+    Inlists = SelectMultipleField('In lists', coerce=int)
     submit = SubmitField('Update')
 
+    def __init__(self, *args, **kwargs):
+        super(UpdateWordForm, self).__init__(*args, **kwargs)
+        if current_user.is_authenticated:
+            self.Inlists.choices = [(l.id, l.listname) for l in current_user.lists]
 
+class BulkEditForm(FlaskForm):
+    flashcards = set()
+    # inList = SelectMultipleField('Change List', coerce=int)
+    add = SubmitField("Add")
+    remove = SubmitField('Remove')
 
+    # def __init__(self, *args, **kwargs):
+    #     super(BulkEditForm, self).__init__(*args, **kwargs)
+    #     if current_user.is_authenticated:
+    #         self.inList.choices = [(l.id, l.listname) for l in current_user.lists]
 
+    def addFlashCards(self, wordList):
+        for w in wordList:
+            wordId = f'flashcard_{w.id}'
+            checkbox = BooleanField(w.word)
+            setattr(BulkEditForm, wordId, checkbox)
+            self.flashcards.add(wordId)
+    
+    def clearFlashcards(self):
+        self.flashcards = None
+        
 
    

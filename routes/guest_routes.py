@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from models import User, Word, List
-from forms import AddVocabularyForm, AddListForm
+from forms import AddFlashcardForm, AddListForm
 from app import db
 
 
