@@ -2,4 +2,5 @@
 template/testing.html
 __pycache__/
 DB_flashcards.db 
+/testing.py
 
