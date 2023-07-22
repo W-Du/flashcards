@@ -2,18 +2,27 @@
 
 {% block toggle %}
 
-<h1>Flashcard - {{ word.word }}</h1>
+<h1>Flashcard</h1>
 
 <nav>
     {% if lst_idx %}
-    <a href="/user/{{ user.username }}/setting/lists/{{ lst_idx }}">Back</a>
+    <a href="/user/{{ user.username }}/lists/{{ lst_idx }}">Back</a>
     {% else %}
     <a href="/user/{{ user.username }}/flashcards">Back</a>
     {% endif %}
 
 </nav>
 
-<p>Meaning: {{ word.description }}</p>
+<div id="toggle-word">
+    <h1 id="word">{{ word.word }}</h1>
+    <h2 id="meaning" style="display:none">Meaning: {{ word.description }}</h2>
+    <p> In lists:
+        {% for l in word.lists %}
+        {{ l.listname }} 
+        {% endfor %}
+    </p>
+</div>
+
 
 <button id="toggle-form">Edit flashcard</button>
 <form style="display:none", id="edit-flashcard", method="POST", action="/user/{{ user.username }}/flashcards/{{ word.id }}">
@@ -59,6 +68,11 @@
         toggleForm('edit-flashcard');
         toggleForm('delete-flashcard');
     })
+    document.getElementById('toggle-word').addEventListener('click', ()=>{
+        toggleForm('meaning');
+        toggleForm('word')
+    })
+
 </script>
 
 {% endblock %}

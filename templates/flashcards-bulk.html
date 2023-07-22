@@ -3,29 +3,20 @@
 {% block content %}
 
 <h1>Bulk Edit | {{ action }} {{ lst.listname }} </h1>
+<br><br>
 
 <nav>
     <a href="/user/{{ user.username }}/lists/{{ lst.id }}">Back to {{ lst.listname }}</a>
 </nav>
 
 <form method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
-    {{ formBulk.hidden_tag() }}
-
-    {% for field in formBulk %}
-    {% if field.type == 'BooleanField' %}
-    <div>
-        {{ field }}
-        <label for="{{ field.id }}">{{ field.label }}</label>
-    </div>
-    {% endif %}
+    {% for word in words %}
+    <input type="checkbox" name="word_id" value="{{ word.id }}">
+    <label for="{{ word.word }}">{{ word.word }}</label>
+    <br>
     {% endfor %}
-    
-    {% if action == 'add to' %}
-    <p> {{ formBulk.add() }}</p>
-    {% elif action == 'remove from' %}
-    <p> {{ formBulk.remove() }}</p>
-    {% endif %}
-
+    <input type="hidden" name="databaseAction" value="{{ action }}"><br>
+    <input type="submit" value="{{ action }} {{ lst.listname}}">
 </form>
 
 {% endblock %}
