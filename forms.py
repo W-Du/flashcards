@@ -55,26 +55,26 @@ class UpdateWordForm(FlaskForm):
         if current_user.is_authenticated:
             self.Inlists.choices = [(l.id, l.listname) for l in current_user.lists]
 
-class BulkEditForm(FlaskForm):
-    flashcards = set()
-    # inList = SelectMultipleField('Change List', coerce=int)
-    add = SubmitField("Add")
-    remove = SubmitField('Remove')
+# class BulkEditForm(FlaskForm):
+#     flashcards = set()
+#     inList = SelectMultipleField('Change List', coerce=int)
+#     add = SubmitField("Add")
+#     remove = SubmitField('Remove')
 
-    # def __init__(self, *args, **kwargs):
-    #     super(BulkEditForm, self).__init__(*args, **kwargs)
-    #     if current_user.is_authenticated:
-    #         self.inList.choices = [(l.id, l.listname) for l in current_user.lists]
+#     def __init__(self, *args, **kwargs):
+#         super(BulkEditForm, self).__init__(*args, **kwargs)
+#         if current_user.is_authenticated:
+#             self.inList.choices = [(l.id, l.listname) for l in current_user.lists]
 
-    def addFlashCards(self, wordList):
-        for w in wordList:
-            wordId = f'flashcard_{w.id}'
-            checkbox = BooleanField(w.word)
-            setattr(BulkEditForm, wordId, checkbox)
-            self.flashcards.add(wordId)
+#     def addFlashCards(self, wordList):
+#         for w in wordList:
+#             wordId = f'flashcard_{w.id}'
+#             checkbox = BooleanField(w.word)
+#             setattr(BulkEditForm, wordId, checkbox)
+#             self.flashcards.add(wordId)
     
-    def clearFlashcards(self):
-        self.flashcards = None
+#     def clearFlashcards(self):
+#         self.flashcards = None
         
 
    

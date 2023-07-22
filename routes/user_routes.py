@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy.sql import func
 from models import User, Word, List
-from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWordForm, UpdateListForm, BulkEditForm
+from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWordForm, UpdateListForm
 from app import db, login_manager
 from functools import wraps
 
@@ -180,52 +180,46 @@ def flashcards(username):
         return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
     return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
 
+
 @user_bp.route('/user/<username>/flashcards/bulk/<listId>', methods=['GET','POST'])
 @login_required
 @check_username_match
 def bulkEdit(username, listId):
     lst = List.query.get(int(listId))
-    formBulk = BulkEditForm()
     action = request.form.get('action')
+    words = None
     if action == 'add to':
-        formBulk.addFlashCards([w for w in current_user.words if lst not in w.lists])
+        words = [w for w in current_user.words if lst not in w.lists]
     elif action == 'remove from':
-        formBulk.addFlashCards(lst.words)
+        words = lst.words
 
-    if formBulk.validate_on_submit():     
-        selected_ids=[]
-        for wordId in formBulk.flashcards:
-            if getattr(formBulk, wordId).data:
-                id = wordId.split('_')[1]
-                selected_ids.append(int(id))
-        print(selected_ids)
-        if formBulk.add.data:
+    if request.method == 'POST':  
+        selected_ids = request.form.getlist('word_id')
+        databaseAction = request.form.get('databaseAction')
+        if databaseAction == 'add to':
             try:
                 for id in selected_ids:
-                    word = Word.query.get(id)
+                    word = Word.query.get(int(id))
                     lst.words.append(word)
                     word.lists.append(lst)
                     db.session.commit()
-                formBulk.clearFlashcards()
                 return redirect(url_for('user.updateList', username=username, id=listId))
             except Exception as e:
                 print(str(e))
-        elif formBulk.remove.data:
+        elif databaseAction == 'remove from':
             try:
                 for id in selected_ids:
-                    word = Word.query.get(id)
-                    word.lists.remove(lst)
-                    lst.words.remove(word)
+                    word = Word.query.get(int(id))
+                    if word in lst.words:
+                        lst.words.remove(word)
+                    if lst in word.lists:
+                        word.lists.remove(lst)
                     db.session.commit()
-                formBulk.clearFlashcards()
-                return redirect(url_for('user.updateList', username=username, id=listId))
             except Exception as e:
                 print(str(e))
-    return render_template('flashcards-bulk.html', formBulk=formBulk, lst=lst, user=current_user, action=action)
-        
-                
-    
-    
+            return redirect(url_for('user.updateList', username=username, id=listId))
+    return render_template('flashcards-bulk.html', words=words, lst=lst, user=current_user, action=action)
+
 
 @user_bp.route('/user/<username>/flashcards/<id>', methods=['GET','POST'])
 @login_required
