@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, session
 from flask_login import current_user, login_user, logout_user, login_required
 from models import User, Word, List
 from forms import RegistrationForm, LoginForm
@@ -59,5 +59,6 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('login.home'))
 

@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy.sql import func
-from models import User, Word, List
+from models import User, Word, List, word_list
 from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWordForm, UpdateListForm
 from app import db, login_manager
 from functools import wraps
@@ -26,6 +26,8 @@ def check_username_match(func):
 @login_required
 @check_username_match
 def profile(username):
+    if not current_user:
+        return redirect(url_for('login.login'))
     return render_template('profile.html', user=current_user)
 
 
@@ -33,18 +35,64 @@ def profile(username):
 @user_bp.route('/user/<username>/practice', methods=['GET', 'POST'])
 @login_required
 @check_username_match
-def practice(username, cur_word_idx = 0):
-    words_today = None
-    if current_user.daily_goal and len(list(current_user.words)) >= current_user.daily_goal:
-        words_today = Word.query.order_by(Word.priority.desc(), func.random()).limit(current_user.daily_goal)          
-    else:
-        words_today = Word.query.order_by(Word.priority.desc(), func.random()).all()
-    length = len(list(words_today))
+def practice(username, cur_word_idx=0, again=-1):
+    words = session.get('words_practice', [])
+    id_review = session.get('id_review', [])
+    goal = session.get('goal', None)
+
     cur_word_idx = request.args.get('index', default=0, type=int)
-    if cur_word_idx >= length:
+    again = request.args.get('again', default=-1, type=int)
+    if again != -1:
+        id_review.append(int(again))
+    length = len(words)
+    if cur_word_idx >= length + len(id_review):
+        if goal > length:
+            session['goal'] = goal - cur_word_idx
+            return redirect(url_for('user.practice_cont', username=username))
         return redirect(url_for('user.completeGoal', username=username))
-    cur_word = words_today[cur_word_idx]
-    return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word, length=length)
+    elif cur_word_idx >= length and cur_word_idx < length + len(id_review):
+        cur_word = words[id_review[cur_word_idx-len(words)]]
+    else:
+        cur_word = words[cur_word_idx]
+    return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word)
+
+
+@user_bp.route('/user/<username>/practice/start', methods=['POST'])
+@login_required
+@check_username_match
+def startPractice(username):
+    goal = request.form.get('goal') or session.get('goal', None)
+    if goal:
+        goal = int(goal)
+    lst = request.form.get('list')      
+    if lst == 'all':
+        words_practice = Word.query.order_by(Word.priority.desc(), func.random()).limit(goal).all()
+    else:
+        list_id = int(lst) 
+        if session.get('list_in_practice_id') is not None:
+            session['list_in_practice_id'].append(list_id)
+        else:
+            session['list_in_practice_id'] = []
+            session['list_in_practice_id'].append(list_id)
+        list_query = List.query.get(list_id)
+        lst_length = len(list(list_query.words))
+        if goal > lst_length:
+            words_practice = Word.query.join(word_list).filter(word_list.c.list_id == list_id).order_by(Word.priority.desc(), func.random()).all()
+        else:
+            words_practice = Word.query.join(word_list).filter(word_list.c.list_id == list_id).order_by(Word.priority.desc(), func.random()).limit(goal).all()
+
+    session['words_practice'] = words_practice
+    session['id_review'] = []
+    session['goal'] = goal
+    return redirect(url_for('user.practice', username=username))
+
+
+@user_bp.route('/user/<username>/practice/continue', methods=['GET','POST'])
+@login_required
+@check_username_match
+def practice_cont(username):
+    return render_template('practice-continue.html', user=current_user)
+
 
 @user_bp.route('/user/<username>/word-priority', methods=['POST'])
 @login_required
@@ -57,17 +105,23 @@ def word_priority(username):
         cur_index = int(request.form.get('cur_index'))
         if action == 'not_remember':
             word.priority += 1
+            db.session.commit()
+            return redirect(url_for('user.practice', username=username, index=cur_index+1, again=cur_index))
         elif action=='remember':
             word.priority -= 1
-        db.session.commit()
+            db.session.commit()            
     except Exception as e:
         print(str(e))
     return redirect(url_for('user.practice', username=username, index=cur_index+1))
 
-@user_bp.route('/user/<username>/goal')
+@user_bp.route('/user/<username>/practice/goal')
 @login_required
 @check_username_match
 def completeGoal(username):
+    session.pop('words_practice', None)
+    session.pop('id_review', None)
+    session.pop('list_in_practice_id', None)
+    session.pop('goal', None)
     return render_template('goalComplete.html', user=current_user)    
 
 @user_bp.route('/user/<username>/setting', methods=['GET','POST'])

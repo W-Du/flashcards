@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "_toggle.html" %}
 
-{% block content %}
+{% block toggle %}
 <h1>Practice</h1>
 
 <nav>
@@ -12,9 +12,14 @@
 </nav>
 
 {% if cur_word %}
-<h3>{{ cur_word.word }}</h3>
-<p>{{ cur_word.description }}</p>
-<p>[{{ cur_word.priority }}]</p>
+<div id="toggle-word">
+    <h2 id="word"> {{ cur_word.word}} </h2>
+    <div id="meaning" style="display:none">
+        <p>Meaning: </p>
+        <h3>{{ cur_word.description }}</h3>
+    </div>
+    <p> priority: {{ cur_word.priority }}</p>
+</div>
 {% else %}
 <p>no word</p>
 {% endif %}
@@ -23,8 +28,56 @@
 <form action="/user/{{ user.username }}/word-priority", method="POST">
     <input type="hidden", name="word_id", value="{{ cur_word.id }}">
     <input type="hidden", name="cur_index", value="{{ cur_word_idx }}">
-    <button type="submit" name="action" value="not_remember">Do not have a clue</button>
-    <button type="submit" name="action" value="remember">I got this</button>
+    <input type="checkbox" name="action" id='not_remember' value="not_remember">Do not have a clue</button>
+    <input type="checkbox" name="action" id='remember' value="remember">I got this</button>
+    <button type="submit">Next</button>
 </form>
+
+<div id="not_remember_text" style="display: none;">
+    <p style="color:green">This word will come up again</p>
+</div>
+
+<div id="remember_text" style="display: none;">
+    <p style="color:green">You learnt this word, it will not be shown to you for a while</p>
+</div>
+
+
+
+<script>
+    document.getElementById('toggle-word').addEventListener('click', ()=>{
+        toggleForm('meaning');
+        toggleForm('word');
+    })
+
+    document.getElementById('not_remember').addEventListener('click', ()=>{
+        toggleText('not_remember', 'not_remember_text');
+        disableCheckbox('not_remember', 'remember');
+    })
+
+    document.getElementById('remember').addEventListener('click', ()=>{
+        toggleText('remember', 'remember_text');
+        disableCheckbox('remember', 'not_remember');
+    })
+
+    const toggleText = (checkboxId, textId) =>{
+        const checkbox = document.getElementById(checkboxId)
+        const text = document.getElementById(textId)
+        if (checkbox.checked == true){
+            text.style.display = 'block'
+        } else {
+            text.style.display = 'none'
+        }
+    }
+
+    const disableCheckbox = (id1, id2) => {
+        const checkbox1 = document.getElementById(id1);
+        const checkbox2 = document.getElementById(id2);
+        if(checkbox1.checked == true){
+            checkbox2.disabled = true
+        } else {
+            checkbox2.disabled = false
+        }
+    }
+</script>
 
 {% endblock %}

@@ -1,30 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ user.username }}'s Homepage</h1>
 
-<p> {{ user.email }}</p>
+<h1>Practice Continue</h1>
 
 <nav>
-    <a href="/user/{{ user.username }}/setting">Setting</a>
-    <a href="/user/{{ user.username }}/flashcards">Create new flashcards</a>
-    <a href="/logout">Log Out</a>
-</nav><br><br>
+    {% if current_user.is_authenticated %}
+    <a href="/user/{{ user.username }}">Home</a>
+    {% else %}
+    <a href="/home">Home</a>
+    {% endif %}
+</nav>
+
+<p> Seems that your list does not have enough words, select another list and continue?</p><br>
 
 <form action="/user/{{ user.username }}/practice/start" method="POST">
-    <label for="goal">Goal</label>
-    <input type="number" id='goal' name="goal" value="7" min="1" max="{{ user.words | length }}"><br><br>
 
     <label for="list">Select a list</label>
     <select id="list" name="list">
         {% for list in user.lists %}
+        {% if list.id not in session['list_in_practice_id'] %}
         <option value="{{ list.id }}">{{ list.listname }} has {{ list.words | length }} flashcards</option>
+        {% endif %}
         {% endfor %}
         <option value="all" selected>All</option>
     </select><br><br>
 
     <input type="submit" value="Practice">
 </form>
-
 
 {% endblock %}
