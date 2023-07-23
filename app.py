@@ -2,12 +2,16 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_login import LoginManager
+from flask_session import Session
 
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'guesswhat'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+
+app.config['SESSION_TYPE'] = 'filesystem'  # You can choose a different storage type
+app.config['SESSION_PERMANENT'] = False
 
 root_folder = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(root_folder, 'DB_flashcards.db')
@@ -26,6 +30,9 @@ from routes.guest_routes import guest_bp
 app.register_blueprint(login_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(guest_bp)
+
+Session(app)
+
 
 
 # with app.app_context():
