@@ -5,6 +5,8 @@ from models import User, Word, List, word_list
 from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWordForm, UpdateListForm
 from app import db, login_manager
 from functools import wraps
+from datetime import datetime
+from functions import elaspedTime
 
 user_bp = Blueprint('user', __name__)
 
@@ -21,13 +23,18 @@ def check_username_match(func):
     return wrapper
 
 
-
 @user_bp.route('/user/<username>')
 @login_required
 @check_username_match
 def profile(username):
     if not current_user:
         return redirect(url_for('login.login'))
+    # update word.priority automatically
+    if 'last_visit_app' not in session or elaspedTime(session['last_visit_app'], datetime.today()) > 3:
+        session['last_visit_app'] = datetime.today()
+        for w in current_user.words:
+            w.updatePriorityTime()
+        db.session.commit()
     return render_template('profile.html', user=current_user)
 
 
@@ -39,21 +46,28 @@ def practice(username, cur_word_idx=0, again=-1):
     words = session.get('words_practice', [])
     id_review = session.get('id_review', [])
     goal = session.get('goal', None)
+    words_review_7 = session.get('words_review_7', [])
 
     cur_word_idx = request.args.get('index', default=0, type=int)
     again = request.args.get('again', default=-1, type=int)
     if again != -1:
         id_review.append(int(again))
     length = len(words)
+    
     if cur_word_idx >= length + len(id_review):
         if goal > length:
             session['goal'] = goal - cur_word_idx
             return redirect(url_for('user.practice_cont', username=username))
+        if len(words_review_7) > 0:
+            return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
         return redirect(url_for('user.completeGoal', username=username))
+    elif len(words_review_7) == 7:
+        return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
     elif cur_word_idx >= length and cur_word_idx < length + len(id_review):
         cur_word = words[id_review[cur_word_idx-len(words)]]
     else:
         cur_word = words[cur_word_idx]
+    words_review_7.append(cur_word)
     return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word)
 
 
@@ -84,6 +98,7 @@ def startPractice(username):
     session['words_practice'] = words_practice
     session['id_review'] = []
     session['goal'] = goal
+    session['words_review_7'] = []
     return redirect(url_for('user.practice', username=username))
 
 
@@ -93,6 +108,17 @@ def startPractice(username):
 def practice_cont(username):
     return render_template('practice-continue.html', user=current_user)
 
+@user_bp.route('/user/<username>/practice/review/<index>', methods=['GET', 'POST'])
+@login_required
+@check_username_match
+def practice_review(username, index):
+    if request.method == 'POST':
+        for w in session['words_review_7']:
+            w.updateLastVisit()
+        db.session.commit()
+        session['words_review_7'] = []
+        return redirect(url_for('user.practice', username=username, index=index))
+    return render_template('practice_review.html', user=current_user, cur_word_idx=index)
 
 @user_bp.route('/user/<username>/word-priority', methods=['POST'])
 @login_required
@@ -122,6 +148,7 @@ def completeGoal(username):
     session.pop('id_review', None)
     session.pop('list_in_practice_id', None)
     session.pop('goal', None)
+    session.pop('words_review_7', None)
     return render_template('goalComplete.html', user=current_user)    
 
 @user_bp.route('/user/<username>/setting', methods=['GET','POST'])
@@ -201,7 +228,6 @@ def deleteList(username, id):
 def flashcards(username):
     form = AddFlashcardForm()
     lst_idx = request.form.get('lst_id')
-    print(lst_idx)
     if form.validate_on_submit():
         try:
             for w in current_user.words:

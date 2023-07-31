@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_login import LoginManager
 from flask_session import Session
+from datetime import timedelta
+
 
 
 
@@ -10,8 +12,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'guesswhat'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 
-app.config['SESSION_TYPE'] = 'filesystem'  # You can choose a different storage type
-app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_TYPE'] = 'filesystem'  
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 root_folder = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(root_folder, 'DB_flashcards.db')

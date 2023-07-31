@@ -2,6 +2,8 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
+from datetime import datetime
+from functions import priorityChange
 
 list_user = db.Table(
     'list_user',
@@ -50,7 +52,20 @@ class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.String(30), index=True, unique=False)
     description = db.Column(db.String)
-    priority = db.Column(db.Integer, default=3, nullable=False)
+    priority = db.Column(db.Integer, default=7, nullable=False)
+    priority_time = db.Column(db.Integer, default=0, nullable=False)
+    last_visit = db.Column(db.DateTime, default = datetime.today(), nullable=False)
     lists = db.relationship('List', secondary=word_list, back_populates='words', cascade='save-update, merge')
     users = db.relationship('User', secondary=word_user, back_populates='words', cascade='save-update, merge')
+    
+    def updatePriorityTime(self):
+        pdiff = priorityChange(self.last_visit)
+        self.priority += pdiff      
+    
+    def updateLastVisit(self):
+        pdiff = priorityChange(self.last_visit, 'review', self.priority)
+        self.priority += pdiff
+        self.last_visit = datetime.today().strftime("%Y/%m/%d")
+        
+
     
