@@ -47,8 +47,9 @@ def practice(username, cur_word_idx=0, again=-1):
     id_review = session.get('id_review', [])
     goal = session.get('goal', None)
     words_review_7 = session.get('words_review_7', [])
-
-    cur_word_idx = request.args.get('index', default=0, type=int)
+    
+    if cur_word_idx == 0:
+        cur_word_idx = request.args.get('index', default=0, type=int)
     again = request.args.get('again', default=-1, type=int)
     if again != -1:
         id_review.append(int(again))
@@ -193,8 +194,6 @@ def updateList(username, id):
     words = lst.words
     form = UpdateListForm()
     formCard = AddFlashcardForm(addToList=[lst.id])
-    # formBulk = BulkEditForm()
-    # formBulk.addFlashCards(words)
     if form.validate_on_submit():
         new_name = form.listname.data
         if new_name != lst.listname:
@@ -267,11 +266,26 @@ def flashcards(username):
 def bulkEdit(username, listId):
     lst = List.query.get(int(listId))
     action = request.form.get('action')
-    words = None
+    words_dict = {}
     if action == 'add to':
         words = [w for w in current_user.words if lst not in w.lists]
+        if len(words) > 0:
+            list_names = [lst.listname for lst in current_user.lists if lst.id is not int(listId)]
+            if list_names:
+                words_dict['words not in any list'] = []
+                for name in list_names:
+                    words_dict[name] = []
+                for i in range(len(words)):
+                    if len(words[i].lists) == 0:
+                        words_dict['words not in any list'].append(words[i])
+                    else:
+                        for l in words[i].lists:
+                            words_dict[l.listname].append(words[i])
+            else:
+                words_dict['words not in any list'] = words
+            
     elif action == 'remove from':
-        words = lst.words
+        words_dict[f'words in {lst.listname}'] = lst.words
 
     if request.method == 'POST':  
         selected_ids = request.form.getlist('word_id')
@@ -298,7 +312,7 @@ def bulkEdit(username, listId):
             except Exception as e:
                 print(str(e))
             return redirect(url_for('user.updateList', username=username, id=listId))
-    return render_template('flashcards-bulk.html', words=words, lst=lst, user=current_user, action=action)
+    return render_template('flashcards-bulk.html', words_dict=words_dict, lst=lst, user=current_user, action=action)
 
 
 @user_bp.route('/user/<username>/flashcards/<id>', methods=['GET','POST'])

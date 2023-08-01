@@ -9,14 +9,43 @@
     <a href="/user/{{ user.username }}/lists/{{ lst.id }}">Back to {{ lst.listname }}</a>
 </nav>
 
+{% if words_dict | length > 0 %}
 <form method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+
+    {% for key, words in words_dict.items() %}
+    {% if words | length > 0 %}
+    <h4>{{ key }}</h4>
     {% for word in words %}
     <input type="checkbox" name="word_id" value="{{ word.id }}">
     <label for="{{ word.word }}">{{ word.word }}</label>
-    <br>
     {% endfor %}
+    {% endif %}
+    {% endfor %}
+    <br><br>
     <input type="hidden" name="databaseAction" value="{{ action }}"><br>
     <input type="submit" value="{{ action }} {{ lst.listname}}">
-</form>
 
+</form>
+{% else %}
+<h5>There is no more word that can be added to {{ lst.listname }}</h5>
+{% endif %}
+
+<script>
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    function handleCheckboxChange(event) {
+        const { name, value, checked } = event.target;
+  
+        checkboxes.forEach(checkbox => {
+            if (checkbox.name === name && checkbox.value === value && checkbox !== event.target) {
+            checkbox.disabled = checked;
+            }
+        });
+    }
+
+    checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', handleCheckboxChange);
+    });
+
+</script>
 {% endblock %}
