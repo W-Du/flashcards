@@ -13,7 +13,13 @@
 
 <form action="/user/{{ user.username }}/practice/start" method="POST">
     <label for="goal">Goal</label>
-    <input type="number" id='goal' name="goal" value="7" min="1" max="{{ user.words | length }}"><br><br>
+    
+    {% if user.words | length >= 7 %}
+    <input type="number" id='goal' name="goal" value="7" min="1" max="{{ user.words | length }}">
+    {% else %}
+    <input type="number" id='goal' name="goal" value="{{ user.words | length }}" min="1" max="{{ user.words | length }}">
+    {% endif %}
+    <br><br>
 
     <label for="list">Select a list</label>
     <select id="list" name="list">
