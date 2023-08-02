@@ -1,5 +1,11 @@
 {% extends "_toggle.html" %}
 
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flashcard-flip.css') }}">
+{% endblock %}
+
+
 {% block toggle %}
 <h1>Practice</h1>
 
@@ -12,13 +18,19 @@
 </nav>
 
 {% if cur_word %}
-<div id="toggle-word">
-    <h2 id="word"> {{ cur_word.word}} </h2>
-    <div id="meaning" style="display:none">
-        <p>Meaning: </p>
+<div class="card" id="toggle-word">
+    <div class="front">
+        <h2 id="word"> {{ cur_word.word}} </h2>
+    </div>
+    <div class="back">
+        <p>Meaning:</p>
         <h3>{{ cur_word.description }}</h3>
     </div>
-    <p> priority: {{ cur_word.priority }}</p>
+    <!-- <div id="meaning" style="display:none">
+        <p>Meaning: </p>
+        <h3>{{ cur_word.description }}</h3>
+    </div> -->
+    <!-- <p> priority: {{ cur_word.priority }}</p> -->
 </div>
 {% else %}
 <p>no word</p>
@@ -44,9 +56,11 @@
 
 
 <script>
-    document.getElementById('toggle-word').addEventListener('click', ()=>{
-        toggleForm('meaning');
-        toggleForm('word');
+    let isFlipped = false;
+    const flashcard = document.getElementById('toggle-word');
+    flashcard.addEventListener('click', ()=>{
+        isFlipped = !isFlipped;
+        flashcard.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0)';
     })
 
     document.getElementById('not_remember').addEventListener('click', ()=>{
@@ -81,3 +95,4 @@
 </script>
 
 {% endblock %}
+
