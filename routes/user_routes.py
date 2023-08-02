@@ -7,8 +7,10 @@ from app import db, login_manager
 from functools import wraps
 from datetime import datetime
 from functions import elaspedTime
+from markupsafe import escape
 
 user_bp = Blueprint('user', __name__)
+
 
 @login_manager.user_loader
 def load_user(id):
@@ -162,7 +164,7 @@ def setting(username):
 
     if form_id == 'list':
         if formList.validate_on_submit():
-            new_list = List(listname=formList.listname.data)
+            new_list = List(listname=escape(formList.listname.data))
             if new_list:
                 db.session.add(new_list)
                 new_list.users.append(current_user)
@@ -195,7 +197,7 @@ def updateList(username, id):
     form = UpdateListForm()
     formCard = AddFlashcardForm(addToList=[lst.id])
     if form.validate_on_submit():
-        new_name = form.listname.data
+        new_name = escape(form.listname.data)
         if new_name != lst.listname:
             lst.listname = new_name
             db.session.commit()

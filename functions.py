@@ -18,15 +18,19 @@ def priorityChange(last_visit, mode=None, cur_priority = None):
         last_visit = last_visit.strftime('%Y/%m/%d')
     if not mode and not cur_priority:
         daydiff = elaspedTime(last_visit, today)
-        return priorityFunction(daydiff)
+        if daydiff != 0:
+            return priorityFunction(daydiff)
     elif mode == 'review' and cur_priority:
         daydiff = elaspedTime(today,last_visit)
-        if daydiff >= -1:
+        if daydiff == 0:
+            pass
+        elif daydiff < -1:
+            pdiff = priorityFunction(daydiff)
+            if pdiff + cur_priority < 0:
+                pdiff = int(pdiff / 2)
+            return pdiff
+        else:
             return -1
-        pdiff = priorityFunction(daydiff)
-        if pdiff + cur_priority < 0:
-            pdiff = int(pdiff / 2)
-        return pdiff
     else:
         raise Exception('wrong parameters for pritoryChange function')
 

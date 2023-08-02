@@ -3,22 +3,41 @@
 {% block content %}
 <h1>{{ user.username }}'s Homepage</h1>
 
+{% if current_user.is_authenticated %}
 <p> {{ user.email }}</p>
+{% endif %}
 
 <nav>
+    {% if current_user.is_authenticated %}
     <a href="/user/{{ user.username }}/setting">Setting</a>
     <a href="/user/{{ user.username }}/flashcards">Create new flashcards</a>
     <a href="/logout">Log Out</a>
+    {% else %}
+    <a href="/guest/setting">Setting</a>
+    <a href="/guest/flashcards">Create new flashcards</a>
+    <a href="/register">Register</a>
+    {% endif %}
 </nav><br><br>
 
-<form action="/user/{{ user.username }}/practice/start" method="POST">
+{% if not current_user.is_authenticated %}
+<div class="guess-notes" style="color:darkolivegreen">
+    <h4>Notes for guest</h4>
+    <p>Some flashcards is added for you. <br>
+        you can add, update, and practice with your flashcards and lists. <br>
+        But your interaction with the app will not be saved. 
+    </p><br>
+</div>
+{% endif %}
+
+<form 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start"
+{% else %} action="/guest/practice/start"
+{% endif %}
+method="POST">
+
     <label for="goal">Goal</label>
-    
-    {% if user.words | length >= 7 %}
-    <input type="number" id='goal' name="goal" value="7" min="1" max="{{ user.words | length }}">
-    {% else %}
-    <input type="number" id='goal' name="goal" value="{{ user.words | length }}" min="1" max="{{ user.words | length }}">
-    {% endif %}
+    <input type="number" id='goal' name="goal" min="1" max="{{ user.words | length }}" 
+    value="{{ 7 if user.words | length >= 7 else user.words | length }}">
     <br><br>
 
     <label for="list">Select a list</label>

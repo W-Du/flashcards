@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h1>{{ user.username }}'s Setting</h1>
 
-<nav>
-    <a href="/user/{{ user.username }}">Back</a>
-</nav>
+<nav><a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
+    {% else %} href = '/guest'
+    {% endif %}
+    >Back</a></nav>
+
 
 <h2>Overview</h2>
 
@@ -14,7 +18,11 @@
 {% if user.lists | length > 0 %}
 {% for l in user.lists %}
 <p>
-    <a href="/user/{{ user.username }}/lists/{{ l.id }}">{{ l.listname }}</a>
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/lists/{{ l.id }}"
+    {% else %} href="/guest/lists/{{ l.listname }}"
+    {% endif %}
+    >{{ l.listname }}</a>
     &emsp; has {{ l.words | length }} words
 </p>
 {% endfor %}
@@ -23,7 +31,13 @@
 {% endif %}
 <br>
 
-<form id='list', action="/user/{{ user.username }}/setting", method='POST'>
+
+<form id='list' 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/setting"
+{% else %} action="/guest/setting"
+{% endif %}
+method='POST'>
+
     {{ formList.hidden_tag() }}
     <input type="hidden" name="form_id" value="list">
     <p>
@@ -39,33 +53,15 @@
 </form>
 <br><br>
 
-<!-- goal -->
-<h3>My daily goal:</h3>
-{% if user.daily_goal %}
-<p>{{ user.daily_goal }}</p>
-{% else %}
-<p>You have not set the daily goal yet.</p>
-{% endif %}
-
-<form id='goal', action="/user/{{ user.username }}/setting", method="POST">
-    {{ formGoal.hidden_tag() }}
-    <input type="hidden" name="form_id" value="goal">
-    <p>
-        {{ formGoal.goal.label }}<br>
-        {{ formGoal.goal(size = 64) }}<br>
-        {% for error in formGoal.goal.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ formGoal.submit() }}
-    </p>
-</form>
-<br><br>
 
 <h3>I have {{ user.words | length }} flashcards. </h3>
-<a href="/user/{{ user.username }}/flashcards">See all my flashcards</a>
 
+
+<a 
+{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards"
+{% else %} href="/guest/flashcards" 
+{% endif %}
+>See all my flashcards</a>
 
 
 {% endblock %}
