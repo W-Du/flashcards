@@ -7,13 +7,17 @@
     {% if current_user.is_authenticated %}
     <a href="/user/{{ user.username }}">Home</a>
     {% else %}
-    <a href="/home">Home</a>
+    <a href="/guest">Home</a>
     {% endif %}
 </nav>
 
 <!-- <a href='/user/{{ user.username }}/flashcards/add'><h3>Add a new Flashcard</h3></a> -->
 <h3 id="toggle-form">Add a new Flashcard</h3>
-<form id="add-card" style="display:none" method="POST" action="/user/{{ user.username }}/flashcards">
+<form id="add-card" 
+{% if not display %} style="display:none" {% endif %} 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"
+{% else %} action="/guest/flashcards"
+{% endif %} method="POST" >
     {{ form.hidden_tag() }}
     <p>
         {{ form.word.label }}<br>
@@ -29,12 +33,10 @@
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
     </p>
-    {% if current_user.is_authenticated and current_user.lists %}
     <p>
         {{ form.addToList.label }}<br>
         {{ form.addToList() }}<br>
     </p>
-    {% endif %}
     <p>
         {{ form.submit() }}
     </p>
@@ -45,7 +47,10 @@
 
 <!--each flashcard-->
 {% for w in words %}
-<a href="/user/{{ user.username }}/flashcards/{{ w.id }}">{{ w.word }}</a><br>
+<a 
+{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}"
+{% else %} href="/guest/flashcards/{{ w.word }}"
+{% endif %}>{{ w.word }}</a><br>
 {% endfor %}
 
 

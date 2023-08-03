@@ -9,7 +9,7 @@
     <a href="/user/{{ user.username }}/practice/start?list={{ lst. id }}">Practice {{ lst.listname }}</a>
     {% else %}
     <a href="/guest/setting">Setting</a>
-    <a href="/guest/practice/start?list={{ lst. listname }}">Practice {{ lst.listname }}</a>
+    <a href="/guest/practice/start?list={{ lst.id }}">Practice {{ lst.listname }}</a>
     {% endif %}
 </nav><br><br>
 
@@ -17,7 +17,7 @@
 <button id="toggle-form">A new name for the list?</button>
 <form id="change-list-name" style="display: none" method="POST" 
 {% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/{{ lst.id }}"
-{% else %} action="/guest/lists/{{ lst.listname }}"
+{% else %} action="/guest/lists/{{ lst.id }}"
 {% endif %}>
     {{ form.hidden_tag() }}
     <p>
@@ -27,10 +27,16 @@
     <p> {{ form.submit() }} </p>
 </form>
 
-{% if current_user.is_authenticated %}
-<form id="delete-list" style="display:none" method="POST" action="/user/{{ user.username }}/lists/delete/{{ lst.id }}">
+
+{% if not current_user.is_authenticated and lst.listname != 'default' %}
+<form id="delete-list" style="display:none" method="POST" 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/delete/{{ lst.id }}"
+{% else %} action="/guest/lists/delete/{{ lst.id }}"
+{% endif %}>
+    {% if lst.words | length > 0 %}
     <input type="checkbox" name="delete-all">
     <label for="delete-all">Delete all words in this list</label>
+    {% endif %}
     <input type="submit" value="Delete List">
 </form>
 {% endif %}
@@ -38,7 +44,10 @@
 <br><br>
 <h3>Add Flashcards</h3>
 <button id="add-word">Create a new Flashcard to {{ lst.listname }}</button>
-<form id="new-flashcard" style="display: none;" method="POST" action='/user/{{ user.username }}/flashcards'>
+<form id="new-flashcard" style="display: none;" method="POST" 
+{% if current_user.is_authenticated %} action='/user/{{ user.username }}/flashcards'
+{% else %} action="/guest/flashcards"
+{% endif %}>
     <input type="hidden" name="lst_id" value="{{ lst.id }}">
     {{ formCard.hidden_tag() }}
     <p>
@@ -55,12 +64,10 @@
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
     </p>
-    {% if current_user.is_authenticated and current_user.lists %}
     <p>
         {{ formCard.addToList.label }}<br>
         {{ formCard.addToList() }}<br>
     </p>
-    {% endif %}
     <p>
         {{ formCard.submit() }}
 
@@ -79,7 +86,10 @@
 
 <div>
 {% for w in words %}
-<a href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}">{{ w.word }}</a>
+<a 
+{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}"
+{% else %} href="/guest/flashcards/{{ w.word }}?list={{ lst.id }}"
+{% endif %}>{{ w.word }}</a>
 {% endfor %}
 </div>
 

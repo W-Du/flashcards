@@ -20,7 +20,7 @@
 <p>
     <a 
     {% if current_user.is_authenticated %} href="/user/{{ user.username }}/lists/{{ l.id }}"
-    {% else %} href="/guest/lists/{{ l.listname }}"
+    {% else %} href="/guest/lists/{{ l.id }}"
     {% endif %}
     >{{ l.listname }}</a>
     &emsp; has {{ l.words | length }} words
