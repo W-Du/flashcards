@@ -33,7 +33,7 @@ app.register_blueprint(guest_bp)
 @app.before_request
 def check_session_lifetime():
     if request.blueprint == 'guests':
-        app.permanent_session_lifetime = timedelta(minutes=60)
+        app.permanent_session_lifetime = timedelta(minutes=10)
     elif request.blueprint == 'user' and not session.get('user_id'):
         app.permanent_session_lifetime = timedelta(minutes=30)
     else:

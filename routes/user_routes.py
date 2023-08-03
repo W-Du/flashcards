@@ -229,12 +229,13 @@ def deleteList(username, id):
 def flashcards(username):
     form = AddFlashcardForm()
     lst_idx = request.form.get('lst_id')
+    display = request.args.get('display')
     if form.validate_on_submit():
         try:
             for w in current_user.words:
                 if w.word == form.word.data:
                     msg = 'you already have this word in flashcards'
-                    return render_template('addCard.html', form=form, message=msg, user=current_user)
+                    return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display, message=msg)
             new_word = Word(word=form.word.data, description=form.description.data)
             selected_lists = form.addToList.data
             if new_word:
@@ -259,6 +260,8 @@ def flashcards(username):
             return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, message=msg)
     if lst_idx is not None:
         return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
+    if display is not None:
+        return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display)
     return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
 
 

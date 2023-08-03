@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField, PasswordField, BooleanField, Selec
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from flask_login import current_user
 from models import List
+from flask import session
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -26,7 +27,12 @@ class AddFlashcardForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(AddFlashcardForm, self).__init__(*args, **kwargs)
         if current_user.is_authenticated:
-            self.addToList.choices = [(l.id, l.listname) for l in current_user.lists]
+            self.addToList.choices = [(l.id, l.listname) for l in current_user.lists]            
+        else:
+            guest = session.get('guest', None)
+            if guest:
+                self.addToList.choices = [(l.id, l.listname) for l in guest.lists]
+                self.addToList.validators =[DataRequired()]
 
 class AddListForm(FlaskForm):
     listname = StringField('Name of list', validators=[DataRequired()])
@@ -54,6 +60,11 @@ class UpdateWordForm(FlaskForm):
         super(UpdateWordForm, self).__init__(*args, **kwargs)
         if current_user.is_authenticated:
             self.Inlists.choices = [(l.id, l.listname) for l in current_user.lists]
+        else:
+            guest = session.get('guest', None)
+            if guest:
+                self.Inlists.choices = [(l.id, l.listname) for l in guest.lists]
+        
 
 # class BulkEditForm(FlaskForm):
 #     flashcards = set()

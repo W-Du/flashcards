@@ -8,8 +8,16 @@ class GuestWord:
     def setDescription(self, description):
         self.description = description
     
-    def addToList(self, listname):
-        self.lists.append(listname)
+    def addToList(self, lst):
+        if not isinstance(lst, GuestList):
+            raise Exception('a GuestList object expected in addToList()')
+        self.lists.append(lst)
+        lst.words.append(self)
+
+    def removeFromList(self, lst):
+        if not isinstance(lst, GuestList):
+            raise Exception('a GuestList object expected in removeFromList()')
+        self.lists = [l for l in self.lists if l.name != lst.name]
 
     def getLists(self):
         return self.lists
@@ -28,6 +36,7 @@ class GuestList:
     def __init__(self, listname):
         self.listname = listname
         self.words = []
+        self.id = 0
 
     def addWords(self, wordsLst):
         for word in wordsLst:
@@ -35,8 +44,8 @@ class GuestList:
                 raise Exception('a GuestWord object expected in addWord()')
             if word not in self.words:
                 self.words.append(word)
-            if self.listname not in word.lists:
-                word.lists.append(self.listname)
+            if self not in word.lists:
+                word.lists.append(self)
             
     def removeWord(self, word):
         if not isinstance(word, GuestWord):
@@ -45,8 +54,11 @@ class GuestList:
             self.words = [w for w in self.words if w.word != word.word]    
             return word   
 
-    def __repr__(self):
-        return 'list name: {}; contains {} words'.format(self.listname, len(self.words))   
+    def setId(self, id):
+        self.id = id
+
+    def __str__(self):
+        return 'list id: {}; list name: {}; contains {} words \n'.format(self.id, self.listname, len(self.words))   
 
 
 class Guest:
@@ -62,6 +74,9 @@ class Guest:
             if lst.listname == l.listname:
                 raise Exception(f'a list with listname of {lst.listname} already exists')
                 return
+        if len(self.lists) > 0:
+            lastLst = self.lists[len(self.lists) -1]
+            lst.setId(lastLst.id + 1)
         self.lists.append(lst)
 
     def removeList(self, lst):
@@ -70,15 +85,29 @@ class Guest:
         else:
             self.lists = [l for l in self.lists if l.listname != lst.listname]
 
-    def getList(self, listname):
+    def getListByName(self, listname):
         for l in self.lists:
             if l.listname == listname:
                 return l
         return None
+    
+    def getListById(self, id):
+        for l in self.lists:
+            if l.id == id:
+                return l
+        return None
 
     def updateWords(self):
+        wordSet=set()
         for lst in self.lists:
-            self.words += lst.words
+            wordSet.update(lst.words)
+        self.words = list(wordSet)
+
+    def getWord(self, word):
+        for w in self.words:
+            if w.word == word:
+                return w
+        return None
             
 
 
@@ -105,9 +134,15 @@ list1.addWords([word1, word2, word3, word4, word5, word6, word7, word8, word9, w
 # guest to be exported
 guestData = Guest()
 guestData.addList(list1)
+# print(list1.id)
 guestData.updateWords()
 
-# print(guest.lists[0])
+list2 = GuestList('list2')
+guestData.addList(list2)
+
+print(list2.id)
+
+# print(guestData.getWord('anomaly'))
 # print(guestData.username)
 
 

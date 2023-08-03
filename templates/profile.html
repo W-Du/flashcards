@@ -10,12 +10,13 @@
 <nav>
     {% if current_user.is_authenticated %}
     <a href="/user/{{ user.username }}/setting">Setting</a>
-    <a href="/user/{{ user.username }}/flashcards">Create new flashcards</a>
+    <a href="/user/{{ user.username }}/flashcards?display=true">Create new flashcards</a>
     <a href="/logout">Log Out</a>
     {% else %}
     <a href="/guest/setting">Setting</a>
-    <a href="/guest/flashcards">Create new flashcards</a>
+    <a href="/guest/flashcards?display=true">Create new flashcards</a>
     <a href="/register">Register</a>
+    <a href="/guest/clear">Clear</a>
     {% endif %}
 </nav><br><br>
 
