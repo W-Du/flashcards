@@ -10,11 +10,10 @@
 <h1>Practice</h1>
 
 <nav>
-    {% if current_user.is_authenticated %}
-    <a href="/user/{{ user.username }}">Home</a>
-    {% else %}
-    <a href="/home">Home</a>
-    {% endif %}
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
+    {% else %} href="/guest" 
+    {% endif %}>Home</a>
 </nav>
 
 {% if cur_word %}
@@ -26,19 +25,20 @@
         <p>Meaning:</p>
         <h3>{{ cur_word.description }}</h3>
     </div>
-    <!-- <div id="meaning" style="display:none">
-        <p>Meaning: </p>
-        <h3>{{ cur_word.description }}</h3>
-    </div> -->
-    <!-- <p> priority: {{ cur_word.priority }}</p> -->
 </div>
 {% else %}
 <p>no word</p>
 {% endif %}
 
 
-<form action="/user/{{ user.username }}/word-priority", method="POST">
-    <input type="hidden", name="word_id", value="{{ cur_word.id }}">
+<form method="POST"
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/word-priority"
+{% else %} action="/guest/word-priority"
+{% endif %}>
+    <input type="hidden", name="word_id", 
+    {% if current_user.is_authenticated %} value="{{ cur_word.id }}"
+    {% else %} value="{{ cur_word.word }}"
+    {% endif %}>
     <input type="hidden", name="cur_index", value="{{ cur_word_idx }}">
     <input type="checkbox" name="action" id='not_remember' value="not_remember">Do not have a clue</button>
     <input type="checkbox" name="action" id='remember' value="remember">I got this</button>

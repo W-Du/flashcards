@@ -28,8 +28,11 @@ class GuestWord:
     def pDecrease(self):
         self.priority -= 1
 
+    # def __repr__(self):
+    #     return self.word + '\n' + self.description
+
     def __repr__(self):
-        return self.word + '\n' + self.description
+        return self.word
 
 
 class GuestList:
@@ -101,7 +104,7 @@ class Guest:
         wordSet=set()
         for lst in self.lists:
             wordSet.update(lst.words)
-        self.words = list(wordSet)
+        self.words = arrangeByPriority(list(wordSet))
 
     def getWord(self, word):
         for w in self.words:
@@ -109,7 +112,12 @@ class Guest:
                 return w
         return None
             
+def arrangeByPriority(lst): # a list of GuestWord objects
+    res = sorted(lst, key=prio, reverse=True)
+    return res
 
+def prio(elem):
+    return elem.priority
 
 
 
@@ -136,14 +144,13 @@ guestData = Guest()
 guestData.addList(list1)
 # print(list1.id)
 guestData.updateWords()
+# word1.priority -= 2
+# word2.priority -= 1
+# word3.priority += 1
+# guestData.updateWords()
 
-list2 = GuestList('list2')
-guestData.addList(list2)
+# print(guestData.words)
 
-print(list2.id)
-
-# print(guestData.getWord('anomaly'))
-# print(guestData.username)
 
 
 

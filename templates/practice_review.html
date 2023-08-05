@@ -5,20 +5,28 @@
 <h1>Practice Review</h1>
 
 <nav>
-    {% if current_user.is_authenticated %}
-    <a href="/user/{{ user.username }}">Home</a>
-    {% else %}
-    <a href="/home">Home</a>
-    {% endif %}
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
+    {% else %} href="/guest"
+    {% endif %}>Home</a>
 </nav>
 
 <p>A concise review session of every 7 words you just learnt</p><br>
 
+{% if words %}
+{% for word in words %}
+<p><strong>{{ word.word }}: </strong> {{ word.description }}</p>
+{% endfor %}
+{% else %}
 {% for word in session['words_review_7'] %}
 <p><strong>{{ word.word }}: </strong> {{ word.description }}</p>
 {% endfor %}
+{% endif %}
 
-<form action="/user/{{ user.username }}/practice/review/{{ cur_word_idx }}" method="POST">
+<form method="POST"
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/review/{{ cur_word_idx }}"
+{% else %} action="/guest/practice/review/{{ cur_word_idx }}"
+{% endif %}>
     <input type="submit" value="Continue">
 </form>
 
