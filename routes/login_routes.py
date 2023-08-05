@@ -3,6 +3,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from models import User, Word, List
 from forms import RegistrationForm, LoginForm
 from app import db, login_manager
+from markupsafe import escape
+
 
 
 login_bp = Blueprint('login', __name__)
@@ -31,9 +33,14 @@ def register():
                 msg = 'Username is taken'
                 form.username.data = None
             return render_template('register.html', form=form, message=msg)
-        new_user = User(username = form.username.data, email = form.email.data)
+        new_user = User(username = escape(form.username.data), email = escape(form.email.data))
         new_user.set_password(form.password.data)
         db.session.add(new_user)
+        db.session.commit()
+        defaultLst = List(listname='default')
+        db.session.add(defaultLst)
+        defaultLst.users.append(new_user)
+        new_user.lists.append(defaultLst)
         db.session.commit()
         login_user(new_user)
         return redirect(url_for('user.profile', username=new_user.username))

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, sessio
 from models import User, Word, List
 from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWordForm, UpdateListForm
 from app import db
-from data import guestData, GuestList, GuestWord
+from data import guestData, GuestList, GuestWord, arrangeByPriority
 from markupsafe import escape
 # from routes/user_routes import processform
 
@@ -27,13 +27,16 @@ def setting():
     formList = AddListForm()
     guest = session.get('guest', None)
     if formList.validate_on_submit():
+        for l in guest.lists:
+            if l.listname == formList.listname.data:
+                msg=f'There is already a list called {formList.listname.data}, try with another listname'
+                return render_template('setting.html', user=guest, formList=formList, message=msg)
         new_list = GuestList(listname=escape(formList.listname.data))
         try:
             guest.addList(new_list)
-            print(new_list.id)
         except Exception as e:
             msg = str(e)
-            return render_template('setting.html', user=guest, formList = formList, message=msg)
+            return render_template('setting.html', user=guest, formList=formList, message=msg)
         formList.listname.data = None
         return render_template('setting.html', user=guest, formList = formList)
     return render_template('setting.html', user=guest, formList = formList)
@@ -53,6 +56,8 @@ def updateList(id):
             lst.listname = new_name
     return render_template('list.html', lst=lst, words=words, user=guest, form=form, formCard=formCard)
 
+
+### lists
 @guest_bp.route('/guest/lists/delete/<id>', methods=['POST'])
 def deleteList(id):
     guest = session.get('guest', None)
@@ -75,6 +80,8 @@ def deleteList(id):
         return redirect(url_for('guests.updateList', id=int(lst_idx)))
     return redirect(url_for('guests.setting'))
 
+
+## flashcards
 @guest_bp.route('/guest/flashcards', methods=['GET', 'POST'])
 def flashcardsG():
     guest = session.get('guest', None)
@@ -82,7 +89,6 @@ def flashcardsG():
         raise Exception("no guest found")
         return
     lst_idx = request.form.get('lst_id')
-    # print('lst_idx', lst_idx)
     form = AddFlashcardForm(addToList=[0])
     display = request.args.get('display')
     if form.validate_on_submit():
@@ -101,7 +107,6 @@ def flashcardsG():
                 guest.updateWords()
             form.word.data = None
             form.description.data = None
-            # print(len(guest.words))
             if lst_idx:
                 return redirect(url_for('guests.updateList', id=int(lst_idx)))
             return render_template('flashcards.html', words=guest.words, form=form, user=guest)
@@ -171,14 +176,141 @@ def deleteFlashcardG(word):
     return redirect(url_for('guests.flashcardsG'))
 
 
+### practice
+@guest_bp.route('/guest/practice', methods=['GET', 'POST'])
+def practice(cur_word_idx=0):
+    guest = session.get('guest', None)
+    if not guest:
+        raise Exception("no guest found")
+    words = session.get('words_practice', [])
+    words_again = session.get('words_again', [])
+    goal = session.get('goal', None)
+    words_review_7 = session.get('words_review_7', set())
+    length = len(words)
+    
+    if cur_word_idx == 0:
+        cur_word_idx = request.args.get('index', default=0, type=int)
+
+    if cur_word_idx >= length:
+        if goal and goal > length:
+            session['goal'] = goal - length
+            return redirect(url_for('guests.practice_cont'))
+        elif len(words_again) == 0 and len(words_review_7) > 0:
+            return redirect(url_for('guests.practice_review', index=cur_word_idx))           
+        elif len(words_again) > 0:
+            cur_word = words_again.pop(0)
+        else:
+            return redirect(url_for('guests.completeGoal'))
+    elif len(words_review_7) == 7:
+        return redirect(url_for('guests.practice_review', index=cur_word_idx))
+    else:
+        cur_word = words[cur_word_idx]
+    words_review_7.add(cur_word)
+    return render_template('practice.html', user=guest, cur_word_idx=cur_word_idx, cur_word=cur_word)
+
+@guest_bp.route('/guest/practice/start', methods=['POST'])
+def startPractice():
+    lst = request.form.get('list')      
+    guest = session.get('guest', None)
+    if not guest:
+        raise Exception("no guest found")
+    goal = request.form.get('goal') or session.get('goal', None)
+    if goal:
+        goal = int(goal)
+    if goal and lst == 'all':
+        words_practice = arrangeByPriority(guest.words)[:goal]
+    elif goal:
+        list_id = int(lst) 
+        if session.get('list_in_practice_id') is not None:
+            session['list_in_practice_id'].append(list_id)
+        else:
+            session['list_in_practice_id'] = [list_id]
+        listObj= guest.getListById(list_id)
+        lst_length = len(listObj.words)
+        if goal >= lst_length:
+            words_practice = listObj.words
+        else:
+            words_practice = arrangeByPriority(listObj.words)[:goal]
+    elif not goal:
+        list_id = int(lst)
+        listObj= guest.getListById(list_id)
+        words_practice = listObj.words
+        
+    session['words_practice'] = words_practice
+    session['goal'] = goal
+    session['words_review_7'] = set()
+    words_again = session.get('words_again', [])
+    if not words_again:
+        session['words_again'] = []
+    return redirect(url_for('guests.practice'))
+
+@guest_bp.route('/guest/practice/continue', methods=['GET','POST'])
+def practice_cont():
+    guest = session.get('guest', None)
+    if not guest:
+        raise Exception("no guest found")
+    
+    return render_template('practice-continue.html', user=guest)
+
+@guest_bp.route('/guest/practice/review/<index>', methods=['GET', 'POST'])
+def practice_review(index):
+    guest = session.get('guest', None)
+    if not guest:
+        raise Exception("no guest found")
+    if request.method == 'POST':
+        session['words_review_7'] = set()
+        return redirect(url_for('guests.practice', index=index))
+    return render_template('practice_review.html', user=guest, cur_word_idx=index)
+
+@guest_bp.route('/guest/word-priority', methods=['POST'])
+def word_priority():
+    guest = session.get('guest', None)
+    words_again = session.get('words_again', [])
+    if not guest:
+        raise Exception("no guest found")
+    try:
+        w = request.form.get('word_id')
+        word = guest.getWord(w)
+        action = request.form.get('action')
+        cur_index = int(request.form.get('cur_index'))
+        if action == 'not_remember':
+            word.priority += 1
+            guest.updateWords()
+            words_again.append(word)
+            # print(words_again)
+            return redirect(url_for('guests.practice', index=cur_index+1))
+        elif action=='remember':
+            word.priority -= 1  
+            guest.updateWords()
+    except Exception as e:
+        print(str(e))
+    return redirect(url_for('guests.practice', index=cur_index+1))
+
+@guest_bp.route('/guest/practice/goal')
+def completeGoal():
+    guest = session.get('guest', None)
+    if not guest:
+        raise Exception("no guest found")
+    session.pop('words_practice', None)
+    session.pop('words_again', None)
+    session.pop('list_in_practice_id', None)
+    session.pop('goal', None)
+    session.pop('words_review_7', None)
+    return render_template('goalComplete.html', user=guest)   
+
+
+## bulk edit
 
 
 
 
-@guest_bp.route('/guest/clear', methods=['POST'])
+
+
+@guest_bp.route('/guest/clear')
 def clear():
     session.pop('guest', None)
-    return redirect(url_for('guests.profileG'))
+    session.clear()
+    return redirect(url_for('guests.profile'))
 
 
 # helper method

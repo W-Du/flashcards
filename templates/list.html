@@ -4,13 +4,18 @@
 <h1>Vocabulary List - {{ lst.listname }}</h1>
 
 <nav>
-    {% if current_user.is_authenticated %}
-    <a href="/user/{{ user.username }}/setting">Setting</a>
-    <a href="/user/{{ user.username }}/practice/start?list={{ lst. id }}">Practice {{ lst.listname }}</a>
-    {% else %}
-    <a href="/guest/setting">Setting</a>
-    <a href="/guest/practice/start?list={{ lst.id }}">Practice {{ lst.listname }}</a>
-    {% endif %}
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/setting"
+    {% else %} href="/guest/setting"
+    {% endif %}>Setting</a>
+
+    <form method="POST" 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start?list={{ lst. id }}"
+    {% else %} action="/guest/practice/start?list={{ lst.id }}"
+    {% endif %}>
+        <input type="hidden" name="list" value="{{ lst.id }}">
+        <input type="submit" value="practice list {{ lst.listname }}">
+    </form>
 </nav><br><br>
 
 

@@ -44,33 +44,32 @@ def profile(username):
 @user_bp.route('/user/<username>/practice', methods=['GET', 'POST'])
 @login_required
 @check_username_match
-def practice(username, cur_word_idx=0, again=-1):
+def practice(username, cur_word_idx=0):
     words = session.get('words_practice', [])
-    id_review = session.get('id_review', [])
     goal = session.get('goal', None)
-    words_review_7 = session.get('words_review_7', [])
-    
+    words_review_7 = session.get('words_review_7', set())
+    words_again = session.get('words_again', [])
+    length = len(words)
+
     if cur_word_idx == 0:
         cur_word_idx = request.args.get('index', default=0, type=int)
-    again = request.args.get('again', default=-1, type=int)
-    if again != -1:
-        id_review.append(int(again))
-    length = len(words)
-    
-    if cur_word_idx >= length + len(id_review):
-        if goal > length:
-            session['goal'] = goal - cur_word_idx
+
+    if cur_word_idx >= length:
+        if goal and goal > length:
+            session['goal'] = goal - length
             return redirect(url_for('user.practice_cont', username=username))
-        if len(words_review_7) > 0:
-            return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
-        return redirect(url_for('user.completeGoal', username=username))
+        elif len(words_again) == 0 and len(words_review_7) > 0:
+            return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))           
+        elif len(words_again) > 0:
+            word_id = int(words_again.pop(0))
+            cur_word = Word.query.get(word_id)
+        else:
+            return redirect(url_for('user.completeGoal', username=username))
     elif len(words_review_7) == 7:
         return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
-    elif cur_word_idx >= length and cur_word_idx < length + len(id_review):
-        cur_word = words[id_review[cur_word_idx-len(words)]]
     else:
         cur_word = words[cur_word_idx]
-    words_review_7.append(cur_word)
+    words_review_7.add(cur_word.id)
     return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word)
 
 
@@ -78,30 +77,35 @@ def practice(username, cur_word_idx=0, again=-1):
 @login_required
 @check_username_match
 def startPractice(username):
+    lst = request.form.get('list')
     goal = request.form.get('goal') or session.get('goal', None)
     if goal:
         goal = int(goal)
-    lst = request.form.get('list')      
-    if lst == 'all':
+    if goal and lst == 'all':
         words_practice = Word.query.order_by(Word.priority.desc(), func.random()).limit(goal).all()
-    else:
+    elif goal:
         list_id = int(lst) 
         if session.get('list_in_practice_id') is not None:
             session['list_in_practice_id'].append(list_id)
         else:
-            session['list_in_practice_id'] = []
-            session['list_in_practice_id'].append(list_id)
+            session['list_in_practice_id'] = [list_id]
         list_query = List.query.get(list_id)
         lst_length = len(list(list_query.words))
         if goal > lst_length:
             words_practice = Word.query.join(word_list).filter(word_list.c.list_id == list_id).order_by(Word.priority.desc(), func.random()).all()
         else:
             words_practice = Word.query.join(word_list).filter(word_list.c.list_id == list_id).order_by(Word.priority.desc(), func.random()).limit(goal).all()
+    elif not goal:
+        list_id = int(lst)
+        list_query = List.query.get(list_id)
+        words_practice = list_query.words
 
     session['words_practice'] = words_practice
-    session['id_review'] = []
     session['goal'] = goal
-    session['words_review_7'] = []
+    if session.get('words_review_7') is None:
+        session['words_review_7'] = set()
+    if session.get('words_again') is None:
+        session['words_again'] = []
     return redirect(url_for('user.practice', username=username))
 
 
@@ -115,27 +119,32 @@ def practice_cont(username):
 @login_required
 @check_username_match
 def practice_review(username, index):
+    words = []
+    for w_id in session['words_review_7']:
+            w = Word.query.get(int(w_id))
+            words.append(w)
     if request.method == 'POST':
-        for w in session['words_review_7']:
+        for w in words:
             w.updateLastVisit()
         db.session.commit()
-        session['words_review_7'] = []
+        session['words_review_7'] = set()
         return redirect(url_for('user.practice', username=username, index=index))
-    return render_template('practice_review.html', user=current_user, cur_word_idx=index)
+    return render_template('practice_review.html', user=current_user, cur_word_idx=index, words=words)
 
 @user_bp.route('/user/<username>/word-priority', methods=['POST'])
 @login_required
 @check_username_match
 def word_priority(username):
+    words_again = session.get('words_again', [])
     try:
         id = int(request.form.get('word_id'))
         word = Word.query.get(id)
         action = request.form.get('action')
         cur_index = int(request.form.get('cur_index'))
         if action == 'not_remember':
+            words_again.append(word.id)
             word.priority += 1
             db.session.commit()
-            return redirect(url_for('user.practice', username=username, index=cur_index+1, again=cur_index))
         elif action=='remember':
             word.priority -= 1
             db.session.commit()            
@@ -148,7 +157,7 @@ def word_priority(username):
 @check_username_match
 def completeGoal(username):
     session.pop('words_practice', None)
-    session.pop('id_review', None)
+    session.pop('words_again', None)
     session.pop('list_in_practice_id', None)
     session.pop('goal', None)
     session.pop('words_review_7', None)
@@ -164,6 +173,10 @@ def setting(username):
 
     if form_id == 'list':
         if formList.validate_on_submit():
+            for l in current_user.lists:
+                if l.listname == formList.listname.data:
+                    msg=f'There is already a list callec {formList.listname.data}'
+                    return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal, message=msg)
             new_list = List(listname=escape(formList.listname.data))
             if new_list:
                 db.session.add(new_list)
@@ -171,7 +184,7 @@ def setting(username):
                 current_user.lists.append(new_list)
                 db.session.commit()
                 formList.listname.data = None
-                return render_template('setting.html', user = current_user, formList = formList, formGoal = formGoal)
+                return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal)
             else:
                 msg = 'Could not create a new list'
                 return render_template('setting.html', user=current_user, formList=formList, formGoal = formGoal, message=msg)
@@ -236,7 +249,7 @@ def flashcards(username):
                 if w.word == form.word.data:
                     msg = 'you already have this word in flashcards'
                     return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display, message=msg)
-            new_word = Word(word=form.word.data, description=form.description.data)
+            new_word = Word(word=escape(form.word.data), description=escape(form.description.data))
             selected_lists = form.addToList.data
             if new_word:
                 db.session.add(new_word)
@@ -331,8 +344,8 @@ def updateFlashcard(username, id):
         word_inlists_idx.append(l.id)
     form = UpdateWordForm(Inlists=word_inlists_idx)
     if form.validate_on_submit():
-        new_description = form.description.data
-        new_word = form.word.data
+        new_description = escape(form.description.data)
+        new_word = escape(form.word.data)
         new_lists_idx = form.Inlists.data
         if not isinstance(new_lists_idx, list):
             new_lists_idx = [new_lists_idx]

@@ -60,12 +60,14 @@ class Word(db.Model):
     
     def updatePriorityTime(self):
         pdiff = priorityChange(self.last_visit)
-        self.priority += pdiff      
+        if pdiff:
+            self.priority += pdiff      
     
     def updateLastVisit(self):
         pdiff = priorityChange(self.last_visit, 'review', self.priority)
-        self.priority += pdiff
-        self.last_visit = datetime.today().strftime("%Y/%m/%d")
+        if pdiff:
+            self.priority += pdiff
+        self.last_visit = datetime.today()
         
 
     
