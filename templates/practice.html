@@ -18,10 +18,10 @@
 
 {% if cur_word %}
 <div class="card" id="toggle-word">
-    <div class="front">
+    <div class="front" style="border-color: {{ color }}">
         <h2 id="word"> {{ cur_word.word}} </h2>
     </div>
-    <div class="back">
+    <div class="back" style="border-color: {{ color }}">
         <p>Meaning:</p>
         <h3>{{ cur_word.description }}</h3>
     </div>

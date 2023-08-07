@@ -6,17 +6,26 @@
 <br><br>
 
 <nav>
-    <a href="/user/{{ user.username }}/lists/{{ lst.id }}">Back to {{ lst.listname }}</a>
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/lists/{{ lst.id }}"
+    {% else %} href="/guest/lists/{{ lst.id }}"
+    {% endif %}>Back to {{ lst.listname }}</a>
 </nav>
 
 {% if words_dict | length > 0 %}
-<form method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+<form method="POST" 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
+{% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
+{% endif %}>
 
     {% for key, words in words_dict.items() %}
     {% if words | length > 0 %}
     <h4>{{ key }}</h4>
     {% for word in words %}
-    <input type="checkbox" name="word_id" value="{{ word.id }}">
+    <input type="checkbox" name="word_id" 
+    {% if current_user.is_authenticated %} value="{{ word.id }}"
+    {% else %} value="{{ word.word }}"
+    {% endif %}>
     <label for="{{ word.word }}">{{ word.word }}</label>
     {% endfor %}
     {% endif %}

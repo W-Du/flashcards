@@ -79,7 +79,10 @@
 </form>
 
 <br>
-<form method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+<form method="POST" 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
+{% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
+{% endif %}>
     <input type="hidden" name="action" value="add to">
     <input type="submit" value="Add existing flashcars to {{ lst.listname }}">
 </form>
@@ -99,7 +102,10 @@
 </div>
 
 
-<form id="bulk-remove" method="POST" action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">
+<form id="bulk-remove" method="POST" 
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
+{% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
+{% endif %}>
     <input type="hidden" name="action" value="remove from">
     <input type="submit" value="Remove flashcards from {{ lst.listname }}">
 </form>

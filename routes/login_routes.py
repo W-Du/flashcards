@@ -15,6 +15,10 @@ def load_user(id):
 
 @login_bp.route('/')
 def home():
+    message = request.args.get('message')
+    if message:
+        msg = 'please try again'
+        return render_template('home.html', message=msg)
     return render_template('home.html')
 
 @login_bp.route('/register', methods=['GET', 'POST'])

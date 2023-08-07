@@ -3,6 +3,7 @@ import math
 
 today = date.today()
 # print(today.strftime("%Y/%m/%d"))
+COLORS = ['#94a231', '#ffd400', '#ffa000', '#ff6500']
 
 
 def elaspedTime(day1, day2):
@@ -44,6 +45,16 @@ def priorityFunction(daydiff):
     
 
 # print(elaspedTime('2021/02/11', today))
+
+def getColorByPriority(priority):
+    if priority >= 15:
+        return COLORS[3]
+    elif priority >= 10:
+        return COLORS[2]
+    elif priority >= 5:
+        return COLORS[1]
+    else:
+        return COLORS[0]
 
 
     
