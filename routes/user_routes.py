@@ -6,7 +6,7 @@ from forms import AddFlashcardForm, AddListForm, ChangeDailyGoalForm, UpdateWord
 from app import db, login_manager
 from functools import wraps
 from datetime import datetime
-from functions import elaspedTime
+from functions import elaspedTime, getColorByPriority
 from markupsafe import escape
 
 user_bp = Blueprint('user', __name__)
@@ -70,7 +70,8 @@ def practice(username, cur_word_idx=0):
     else:
         cur_word = words[cur_word_idx]
     words_review_7.add(cur_word.id)
-    return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word)
+    color = getColorByPriority(cur_word.priority)
+    return render_template('practice.html', user=current_user, cur_word_idx=cur_word_idx, cur_word=cur_word, color=color)
 
 
 @user_bp.route('/user/<username>/practice/start', methods=['POST'])
@@ -206,6 +207,7 @@ def setting(username):
 @check_username_match
 def updateList(username, id):
     lst = List.query.get(int(id))
+    message = request.args.get('message')
     words = lst.words
     form = UpdateListForm()
     formCard = AddFlashcardForm(addToList=[lst.id])
@@ -214,6 +216,9 @@ def updateList(username, id):
         if new_name != lst.listname:
             lst.listname = new_name
             db.session.commit()
+    if message:
+        msg='you already have this flashcard'
+        return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard, message=msg)
     return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard)
 
 @user_bp.route('/user/<username>/lists/delete/<id>', methods=['POST'])
@@ -247,7 +252,9 @@ def flashcards(username):
         try:
             for w in current_user.words:
                 if w.word == form.word.data:
-                    msg = 'you already have this word in flashcards'
+                    if lst_idx:
+                        return redirect(url_for('user.updateList', username=username, id=int(lst_idx), message='exist'))
+                    msg = 'you already have this flashcard'
                     return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display, message=msg)
             new_word = Word(word=escape(form.word.data), description=escape(form.description.data))
             selected_lists = form.addToList.data
