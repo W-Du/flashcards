@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style-menu.css') }}">
+{% block styles2 %}{% endblock %}
+{% endblock %}
+
+
+{% block title %}{% endblock %}
+
+{% block content %}
+{% block content2 %}{% endblock %}
+<div class="center">
+    <button id="toggle-menu">Menu</button>
+    <div class="menu" id="menu" style="display:none">
+        <div class="nav">
+            <nav>
+                {% block nav %}{% endblock %}
+                {% if current_user.is_authenticated %}
+                <a href="/user/{{ current_user.username }}">Home</a>
+                <a href="/user/{{ current_user.username }}/setting">Settings</a>
+                <a class="logout" href="/logout">Logout</a>
+                {% else %}
+                <a href="/guest">Home</a>
+                <a href="/guest/setting">Setting</a>
+                <a href="/register">Register</a>
+                <a href="/guest/clear">Reset</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    document.getElementById('toggle-menu').addEventListener('click', () => {
+        toggleForm('menu');
+    })
+</script>
+{% endblock %}

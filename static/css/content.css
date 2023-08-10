@@ -1,0 +1,114 @@
+.links {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
+    grid-template-rows: auto;
+    position: relative;
+    top: 40vh;
+} 
+
+.links a {
+    color: black;
+    margin: 10px;
+}
+
+.form-jinja, .form-html {
+    width: 80%;
+    position: relative;
+    left: 10%;
+    top: 10%;
+}
+
+.hidden-form h3 {
+    color: darkgray;
+    padding-bottom: 30px;
+}
+
+
+.form-jinja div {
+    padding-bottom: 20px;
+}
+
+.form-label {
+    font-size: 12px;
+    width: 15vh;
+    padding-right: 2vh;
+    text-align: left;
+    vertical-align: top;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.form-input, .form-textarea {
+    width: min(50vh, 80%);
+    border-radius: 5px;
+    box-shadow: none;
+    border: lightgray solid 1px;
+    font-size: 16px;
+}
+
+.form-input {
+    height: 5vh;
+}
+
+.form-textarea {
+    height: 20vh;
+    overflow: scroll;
+}
+
+.form-button, .form-link {
+    height: 5vh;
+    width: 50vh;
+    box-shadow: none;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.form-button {
+    background-color: black;
+    color: grey;
+    margin-top: 30px;
+}
+
+.form-link a {
+    display: block;
+    margin: 20px;
+    color:black;
+    text-decoration: none;
+}
+
+input.form-link {
+    color: black;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.form-input:focus {
+    border: darkgreen solid 1px;
+    outline: none;
+}
+
+.form-textarea:focus {
+    border: darkgreen solid 1px;
+    outline: none;
+}
+
+.form-button:hover {
+    color: white;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}
+
+input.form-link:hover {
+    text-decoration: underline;
+}
+
+
+
+

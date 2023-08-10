@@ -1,32 +1,42 @@
-{% extends "base.html" %}
+{% extends "_base.html" %}
+
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+{% endblock %}
+
+
+{% block title %}
+    <h1>Login</h1>   
+{% endblock %}
+
 
 {% block content %}
-
-<h1>Login</h1>
-<nav>
-    <a href="/register">Register</a>
-</nav>
-
-<form action="/login", method="POST">
+<h3 class="form-title">Login</h3>
+<form class='form-jinja' action="/login", method="POST">
     {{ form.hidden_tag() }}
-
-    <p>
-        {{ form.username.label }}<br>
-        {{ form.username(size=32) }}<br>
+    <div>
+        {{ form.username.label(class='form-label') }}<br>
+        {{ form.username(class='form-input') }}
         {% for error in form.username.errors %}
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32) }}<br>
+    </div>
+    <div>
+        {{ form.password.label(class='form-label') }}<br>
+        {{ form.password(class='form-input') }}
         {% for error in form.password.errors %}
+        <br>
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.submit() }}
-    </p>
+    </div>
+    <div>
+        {{ form.submit(class='form-button') }}
+    </div>
+    <div class="form-link">
+        <a href="/register">Register</a>
+        <a href="/guest">Explore App without an Account</a>
+    </div>
 
 </form>
 
