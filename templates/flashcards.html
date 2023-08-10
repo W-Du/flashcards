@@ -1,65 +1,64 @@
-{% extends "_toggle.html" %}
+{% extends "_menu.html" %}
 
-{% block toggle %}
+{% block styles2 %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+{% endblock %}
+
+{% block title %}
 <h1>All Flashcards</h1>
-
-<nav>
-    {% if current_user.is_authenticated %}
-    <a href="/user/{{ user.username }}">Home</a>
-    {% else %}
-    <a href="/guest">Home</a>
-    {% endif %}
-</nav>
-
-<!-- <a href='/user/{{ user.username }}/flashcards/add'><h3>Add a new Flashcard</h3></a> -->
-<h3 id="toggle-form">Add a new Flashcard</h3>
-<form id="add-card" 
-{% if not display %} style="display:none" {% endif %} 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"
-{% else %} action="/guest/flashcards"
-{% endif %} method="POST" >
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.word.label }}<br>
-        {{ form.word(size = 64) }}<br>
-        {% for error in form.word.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.description.label }}<br>
-        {{ form.description(size = 128) }}<br>
-        {% for error in form.description.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.addToList.label }}<br>
-        {{ form.addToList() }}<br>
-    </p>
-    <p>
-        {{ form.submit() }}
-    </p>
-
-</form>
+{% endblock %}
 
 
+{% block content2 %}
+<div class="hidden-form">
+    <h3 id="toggle-card">Add a new Flashcard</h3>
+    <form id="add-card" class="form-jinja"
+    {% if not display %} style="display:none" {% endif %} 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"
+    {% else %} action="/guest/flashcards"
+    {% endif %} method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.word.label(class='form-label') }}
+            {{ form.word(class='form-input') }}
+            {% for error in form.word.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.description.label(class='form-label') }}
+            {{ form.description(class='form-textarea') }}
+            {% for error in form.description.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.addToList.label(class='form-label') }}
+            {{ form.addToList(class='form-select') }}<br>
+        </div>
+        <div>
+            <p class="form-label"></p>
+            {{ form.submit(class='form-button') }}
+        </div>
+
+    </form>
+</div>
 
 <!--each flashcard-->
-{% for w in words %}
-<a 
-{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}"
-{% else %} href="/guest/flashcards/{{ w.word }}"
-{% endif %}>{{ w.word }}</a><br>
-{% endfor %}
-
-
+<div class="links">
+    {% for w in words %}
+    <a
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}"
+    {% else %} href="/guest/flashcards/{{ w.word }}"
+    {% endif %}>{{ w.word }}</a>
+    {% endfor %}
+</div>
 
 <script>
-    document.getElementById('toggle-form').addEventListener('click', () => {
+    document.getElementById('toggle-card').addEventListener('click', () => {
         toggleForm('add-card');
     })
 </script>
-
-
 {% endblock %}

@@ -1,11 +1,110 @@
-{% extends '_toggle.html' %}
+{% extends '_menu.html' %}
 
-{% block toggle %}
+{% block styles2 %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flashcard-flip.css') }}">
+{% endblock %}
 
+
+{% block title %}
 <h1>Flashcard</h1>
+{% endblock %}
 
-<nav>
-    {% if current_user.is_authenticated %}
+
+{% block content2 %}
+
+<div class="hidden-form">
+    <h3 class="toggle-card" id="toggle-form">Edit flashcard</h3>
+
+    <form class='form-jinja' style="display:none", id="edit-flashcard", method="POST", 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/{{ word.id }}"
+    {% else %} action="/guest/flashcards/{{ word.word }}"
+    {% endif %}>
+        {{ form.hidden_tag() }}
+        {% if lst_idx %}
+        <input type="hidden", name="lst_id", value="{{ lst_idx }}">
+        {% endif %}
+
+        <div>
+            {{ form.word.label(class='form-label') }}
+            {{ form.word(class='form-input', value = word.word) }}
+            {% for error in form.word.errors %}
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div> 
+            {{ form.description.label(class='form-label') }}
+            {{ form.description(class='form-textarea') }}
+            {% for error in form.description.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.Inlists.label(class='form-label') }}
+            {{ form.Inlists() }}
+            {% for error in form.Inlists.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div> 
+            <p class='form-label'></p>
+            {{ form.submit(class='form-button') }}
+        </div>
+    </form>
+
+    <form class='form-html', style="display: none", id="delete-flashcard", method='POST', 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/delete/{{ word.id }}"
+    {% else %} action="/guest/flashcards/delete/{{ word.word }}"
+    {% endif %}>
+        {% if request.args.get('list') %}
+        <input type="hidden", name="lst_id", value="{{ request.args.get('list') }}">
+        {% endif %}
+        <div>
+            <p class="form-label"></p>
+            <input class='form-link' type="submit", value="Delete Flashcard">
+        </div>
+    </form>
+</div>
+
+<div class="card" id="toggle-word">
+    <div class="front" style="border-color: {{ color }}">
+        <h2 id="word"> {{ word.word}} </h2>
+    </div>
+    <div class="back" style="border-color: {{ color }}">
+        <h3>{{ word.description }}</h3>
+    </div>
+</div>
+
+
+
+
+<script>
+    let isFlipped = false;
+    const flashcard = document.getElementById('toggle-word');
+    flashcard.addEventListener('click', ()=>{
+        isFlipped = !isFlipped;
+        flashcard.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0)';
+    })
+
+    
+    let formOpen = false;
+    const title = document.getElementById('toggle-form');
+    title.addEventListener('click', () => {
+        formOpen = !formOpen;
+        title.textContent = formOpen ? 'Back' : 'Edit Flashcard';
+        toggleForm('edit-flashcard');
+        toggleForm('delete-flashcard');
+        toggleForm('toggle-word');
+    })
+
+</script>
+{% endblock %}
+
+
+{% block nav %}
+{% if current_user.is_authenticated %}
     <a 
     {% if lst_idx %} href="/user/{{ user.username }}/lists/{{ lst_idx }}"
     {% else %} href="/user/{{ user.username }}/flashcards"
@@ -15,76 +114,5 @@
     {% if lst_idx %} href="/guest/lists/{{ lst_idx }}"
     {% else %} href="/guest/flashcards"
     {% endif %}>Back</a>
-    {% endif %}
-</nav>
-
-<div id="toggle-word">
-    <h1 id="word">{{ word.word }}</h1><br>
-    <p>Meaning:</p>
-    <p id="meaning">{{ word.description }}</p><br>
-    <p> In lists:
-        {% for l in word.lists %}
-        {{ l.listname }} 
-        {% endfor %}
-    </p>
-</div>
-
-
-<button id="toggle-form">Edit flashcard</button>
-<form style="display:none", id="edit-flashcard", method="POST", 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/{{ word.id }}"
-{% else %} action="/guest/flashcards/{{ word.word }}"
-{% endif %}>
-    {{ form.hidden_tag() }}
-    {% if lst_idx %}
-    <input type="hidden", name="lst_id", value="{{ lst_idx }}">
-    {% endif %}
-
-    <p>
-        {{ form.word.label }}<br>
-        {{ form.word(size = 64, value = word.word) }}
-        {% for error in form.word.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p> 
-        {{ form.description.label }}<br>
-        {{ form.description(size=64, value = word.description) }}
-        {% for error in form.description.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.Inlists.label }}<br>
-        {{ form.Inlists() }}
-        {% for error in form.Inlists.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p> {{ form.submit() }}</p>
-</form>
-
-
-<form style="display: none", id="delete-flashcard", method='POST', 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/delete/{{ word.id }}"
-{% else %} action="/guest/flashcards/delete/{{ word.word }}"
-{% endif %}>
-    {% if request.args.get('list') %}
-    <input type="hidden", name="lst_id", value="{{ request.args.get('list') }}">
-    {% endif %}
-    <input type="submit", value="Delete Flashcard">
-</form>
-
-<script>
-    document.getElementById('toggle-form').addEventListener('click', () => {
-        toggleForm('edit-flashcard');
-        toggleForm('delete-flashcard');
-    })
-    // document.getElementById('toggle-word').addEventListener('click', ()=>{
-    //     toggleForm('meaning');
-    //     toggleForm('word')
-    // })
-
-</script>
-
+{% endif %}
 {% endblock %}

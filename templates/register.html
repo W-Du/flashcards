@@ -1,47 +1,58 @@
-{% extends "base.html" %}
+{% extends "_base.html" %}
+
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+{% endblock %}
+
+
+{% block title %}
+    <h1>Register</h1>   
+{% endblock %}
+
 
 {% block content %}
-
-<h1>Register</h1>
-<nav>
-    <a href="/login">Login</a>
-</nav>
-<br><br>
-
-<form action="/register" method="post">
+<h3 class="form-title">Register</h3>
+<form class='form-jinja' action="/register" method="post">
     {{ form.hidden_tag() }}
-    <p>
-        {{ form.username.label }}<br>
-        {{ form.username(size = 32) }}<br>
+    <div>
+        {{ form.username.label(class='form-label') }}<br>
+        {{ form.username(class='form-input') }}
         {% for error in form.username.errors %} 
-        <span style="color:red">[{{ error }}]</span>
+        <br>
+        <span class="error">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(size=64) }}<br>
+    </div>
+    <div>
+        {{ form.email.label(class='form-label')  }}<br>
+        {{ form.email(class='form-input') }}<br>
         {% for error in form.email.errors %}
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32) }}<br>
+    </div>
+    <div>
+        {{ form.password.label(class='form-label')  }}<br>
+        {{ form.password(class='form-input') }}<br>
         {% for error in form.password.errors %}
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.password2.label }}<br>
-        {{ form.password2(size=32) }}<br>
+    </div>
+    <div>
+        {{ form.password2.label(class='form-label')  }}<br>
+        {{ form.password2(class='form-input') }}<br>
         {% for error in form.password2.errors %}
         <span style="color:red">[{{ error }}]</span>
         {% endfor %}
-    </p>
-    <p>
-        {{ form.submit() }}
-    </p>
+    </div>
+    <div>
+        {{ form.submit(class='form-button') }}
+    </div>
+    <div class='form-link'>
+        <a href="/login">Login</a>
+        <a href="/guest">Explore App without an Account</a>
+    </div>
 </form>
+
 
 
 {% endblock %}

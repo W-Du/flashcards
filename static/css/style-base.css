@@ -1,0 +1,57 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.message {
+    width: 30%;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff4c7;
+    margin: auto;
+    border-radius: 20px;
+    border: solid 2px #ffd154;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    color: #595959;
+}
+
+.title {
+    position: fixed;
+    width: 40%;
+    height: 100%;
+    background-color: white;    
+}
+
+.title h1 {
+    font-size: 5em;
+    overflow: hidden;
+    position: absolute;
+    bottom: 20vh;
+    width: 100%;
+    text-align: center; 
+}
+
+.info p {
+    display: inline-block;
+    font-size: 2vh;
+    position: relative;
+    top: 7vh;
+    left: 5vh;
+}
+
+.content {
+    position: absolute;
+    left: 40%;
+    width: 45%;
+    height: max-content;
+    padding: 7vh 5vh;
+}
+
+
+
+
+
+

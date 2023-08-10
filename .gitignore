@@ -4,4 +4,5 @@ __pycache__/
 DB_flashcards.db 
 /testing.py
 templates/setting_archive.html
+templates/temp.css
 

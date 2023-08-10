@@ -349,7 +349,7 @@ def updateFlashcard(username, id):
     word_inlists_idx = []
     for l in word.lists:
         word_inlists_idx.append(l.id)
-    form = UpdateWordForm(Inlists=word_inlists_idx)
+    form = UpdateWordForm(Inlists=word_inlists_idx, description=word.description)
     if form.validate_on_submit():
         new_description = escape(form.description.data)
         new_word = escape(form.word.data)

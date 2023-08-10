@@ -1,0 +1,52 @@
+<html>
+    <head>
+    
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>flashcards</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style-base.css') }}">
+        {% block styles %}{% endblock %}
+    </head>
+
+    <body>
+
+        <div class="title">
+            <div class="info">
+                <p><strong>
+                    {% if current_user.is_authenticated %} {{ current_user.username }} | 
+                    {% else %} Guest 
+                    {% endif %}
+                </strong>
+                {% if current_user.is_authenticated %} <em>{{ current_user.email }}</em>
+                {% endif %}
+            </div>
+            {% block title %}{% endblock %}
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+
+            <br><br>
+            {% if message %}
+            <div class='message'>{{ message }}</div>
+            {% endif %}
+        </div>
+
+        
+        <script>
+            const toggleForm = (formId) => {
+                const form = document.getElementById(formId);
+                if (form.style.display === 'none'){
+                    form.style.display = 'block'
+                } else {
+                    form.style.display = 'none'
+                }
+            }
+            const goBack = () => {
+                window.history.back();
+            }
+        </script>
+        {% block script %}{% endblock %}
+        
+    </body>
+</html>

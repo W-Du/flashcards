@@ -52,7 +52,7 @@ class UpdateListForm(FlaskForm):
 
 class UpdateWordForm(FlaskForm):
     word= StringField('Word', validators=[DataRequired()])
-    description = StringField('Meaning', validators=[DataRequired()])
+    description = TextAreaField('Meaning', validators=[DataRequired()])
     Inlists = SelectMultipleField('In lists', coerce=int)
     submit = SubmitField('Update')
 
