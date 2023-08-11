@@ -1,12 +1,12 @@
 {% extends '_menu.html' %}
 
 {% block styles2 %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flashcard-flip.css') }}">
 {% endblock %}
 
 
-{% block title %}
+{% block title2 %}
 <h1>Flashcard</h1>
 {% endblock %}
 
@@ -14,7 +14,7 @@
 {% block content2 %}
 
 <div class="hidden-form">
-    <h3 class="toggle-card" id="toggle-form">Edit flashcard</h3>
+    <h3 class="toggle-title" id="toggle-form">Edit flashcard</h3>
 
     <form class='form-jinja' style="display:none", id="edit-flashcard", method="POST", 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/{{ word.id }}"
@@ -29,6 +29,7 @@
             {{ form.word.label(class='form-label') }}
             {{ form.word(class='form-input', value = word.word) }}
             {% for error in form.word.errors %}
+            <br>
             <span class="error">[{{ error }}]</span>
             {% endfor %}
         </div>

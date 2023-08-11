@@ -1,5 +1,4 @@
 .center {
-    text-align: right;
     position: fixed;  
     right: 0;
     top: 0;
@@ -7,18 +6,9 @@
     width: 12%;
 }
 
-#toggle-menu {
-    position: relative;
-    align-items: right;
-    top: 7vh;
-    margin-right: 5vh;
-    z-index: 1;
-    
-}
-
 .menu {
     padding-top: 80px;
-    text-align: inherit;
+    text-align: left;
     border-left: solid darkgray 1px;
     height: 100%;
     width: 100%;
@@ -26,12 +16,8 @@
     top: 0;
 }
 
-
 .nav {
-    margin-top: 15vh;
-    margin-right: 5vh;
-    margin-bottom: 20px;
-
+    margin: 15vh 0 20px 7vh;
 }
 
 nav a {
@@ -43,5 +29,36 @@ nav a {
 }
 
 
+/* menu icon */
+
+.menu-icon {
+    position: relative;
+    top: 7vh;
+    left: 7vh;
+    align-items: right;
+    margin-right: 5vh;
+    z-index: 1;
+    cursor: pointer;
+}
+  
+.bar1, .bar2, .bar3 {
+    width: 35px;
+    height: 5px;
+    background-color: #333;
+    margin: 6px 0;
+    transition: 0.4s;
+}
+
+.change .bar1 {
+    transform: translate(0, 11px) rotate(-45deg);
+}
+
+.change .bar2 {
+    opacity: 0;
+}
+
+.change .bar3 {
+    transform: translate(0, -11px) rotate(45deg);
+}
 
 

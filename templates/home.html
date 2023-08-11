@@ -1,15 +1,26 @@
 {% extends "_base.html" %}
 
-{% block content %}
-<h1>Home</h1>
-<nav>
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
-    <!-- <a href="/guest">Explore without an account</a> -->
-</nav>
 
-<p>
-    Or try this app as a <a href="/guest">guest</a>
-</p>
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-home.css') }}">
+{% endblock %}
+
+
+{% block title %}
+<h1>Welcome to Flashcards</h1>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="quotation">
+    <blockquote>Flashcards are one of the many methods students have traditionally utilized to help themselves learn 
+    new vocabulary. It allows them to repeatedly quiz themselves and built a base on which they can build 
+    their higher levels of learning.
+    <cite>Harvard Wiki</cite></blockquote>
+</div>
+
+
+<a class='symbol-btn' href="/register">Go To App</a>
 
 {% endblock %}

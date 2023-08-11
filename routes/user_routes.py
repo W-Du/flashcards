@@ -345,6 +345,7 @@ def bulkEdit(username, listId):
 @check_username_match
 def updateFlashcard(username, id):
     word = Word.query.get(int(id))
+    color = getColorByPriority(word.priority)
     lst_idx = request.form.get('lst_id') or request.args.get('list')
     word_inlists_idx = []
     for l in word.lists:
@@ -374,8 +375,8 @@ def updateFlashcard(username, id):
             except Exception as e:
                 print(str(e))
     if lst_idx is not None:
-        return render_template('word.html', word=word, user=current_user, form=form, lst_idx=int(lst_idx))
-    return render_template('word.html', word=word, user=current_user, form=form)
+        return render_template('word.html', word=word, user=current_user, form=form, lst_idx=int(lst_idx), color=color)
+    return render_template('word.html', word=word, user=current_user, form=form, color=color)
 
 
 @user_bp.route('/user/<username>/flashcards/delete/<id>', methods=['POST'])
