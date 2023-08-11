@@ -37,9 +37,20 @@
 .info p {
     display: inline-block;
     font-size: 2vh;
-    position: relative;
-    top: 7vh;
-    left: 5vh;
+    padding: 7vh 0 0 5vh;
+}
+
+.remark {
+    padding: 0 0 3vh 0;
+    font-style: italic;
+    font-size: 1.8vh;
+    width: 70%;
+    color: darkgray;
+    line-height: 2.5vh;
+}
+
+.remark h4 {
+    text-decoration: underline;
 }
 
 .content {
@@ -50,7 +61,9 @@
     padding: 7vh 5vh;
 }
 
-
+.remark:hover {
+    color: darkred;
+}
 
 
 

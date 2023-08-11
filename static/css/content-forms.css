@@ -2,8 +2,9 @@
     display: grid;
     grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
     grid-template-rows: auto;
+    padding-bottom: 10vh;
     position: relative;
-    top: 40vh;
+    top: 10vh;
 } 
 
 .links a {
@@ -11,20 +12,27 @@
     margin: 10px;
 }
 
+.hidden-form {
+    height: max-content;
+    min-height: 50vh;
+}
+
 .form-jinja, .form-html {
     width: 80%;
     position: relative;
     left: 10%;
-    top: 10%;
+    top: 20px;
 }
 
-.hidden-form h3 {
+.form-title, h3.profile-opt, .toggle-title {
     color: darkgray;
-    padding-bottom: 30px;
+    padding-bottom: 20px;
+    z-index: 1;
+    font-size: 14pt;
+    font-weight: 800;
 }
 
-
-.form-jinja div {
+.form-jinja div, .from-html div {
     padding-bottom: 20px;
 }
 
@@ -87,6 +95,15 @@ input.form-link {
     background-color: transparent;
 }
 
+a.profile-opt {
+    color: darkgray;
+    display: block;
+    padding-bottom: 20px;
+    font-size: 14pt;
+    font-weight: 800;
+    text-decoration: none;
+}
+
 .form-input:focus {
     border: darkgreen solid 1px;
     outline: none;
@@ -109,6 +126,18 @@ input.form-link:hover {
     text-decoration: underline;
 }
 
+a.profile-opt:hover, .toggle-title:hover {
+    color: black;
+    text-decoration: underline;
+}
 
+.profile-opt:before, .toggle-title:before {
+    display: inline-block;
+    color: darkgray;
+    padding: 0 1vh 0.5vh 0;
+    content: '\25B6';
+    font-size: 1.5vh;
+    vertical-align: middle;
+}
 
 

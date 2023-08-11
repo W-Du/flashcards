@@ -1,17 +1,17 @@
 {% extends "_menu.html" %}
 
 {% block styles2 %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
 {% endblock %}
 
-{% block title %}
+{% block title2 %}
 <h1>All Flashcards</h1>
 {% endblock %}
 
 
 {% block content2 %}
 <div class="hidden-form">
-    <h3 id="toggle-card">Add a new Flashcard</h3>
+    <h3 class='toggle-title' id="toggle-card">Add a new Flashcard</h3>
     <form id="add-card" class="form-jinja"
     {% if not display %} style="display:none" {% endif %} 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"

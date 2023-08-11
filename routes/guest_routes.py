@@ -123,6 +123,7 @@ def flashcardsG():
 def updateFlashcardG(word):
     guest = retrieveGuest()
     wordObj = guest.getWord(word)
+    color = getColorByPriority(wordObj.priority)
     lst_idx = request.form.get('lst_id') or request.args.get('list')
     word_inlists_idx = []
     for l in wordObj.lists:
@@ -152,8 +153,8 @@ def updateFlashcardG(word):
             except Exception as e:
                 print(str(e))
     if lst_idx is not None:
-        return render_template('word.html', word=wordObj, user=guest, form=form, lst_idx=int(lst_idx))
-    return render_template('word.html', word=wordObj, user=guest, form=form)
+        return render_template('word.html', word=wordObj, user=guest, form=form, lst_idx=int(lst_idx), color=color)
+    return render_template('word.html', word=wordObj, user=guest, form=form, color=color)
 
 @guest_bp.route('/guest/flashcards/delete/<word>', methods=['POST'])
 def deleteFlashcardG(word):
@@ -200,7 +201,6 @@ def practice(cur_word_idx=0):
         cur_word = words[cur_word_idx]
     words_review_7.add(cur_word)
     color = getColorByPriority(cur_word.priority)
-    # print(color)
     return render_template('practice.html', user=guest, cur_word_idx=cur_word_idx, cur_word=cur_word, color=color)
 
 @guest_bp.route('/guest/practice/start', methods=['POST'])

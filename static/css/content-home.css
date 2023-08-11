@@ -1,0 +1,55 @@
+p.intro {
+    font-size: 1.8em;
+    line-height: 2em;
+}
+
+.content h1 {
+    font-size: 3em;
+    font-style: oblique;
+    padding: 0 0 5vh 0;
+}
+
+.quotation {
+    width: 90%;
+    position: relative;
+    padding-left: 20px;
+}
+
+blockquote {
+    font-size: 1.5em;
+    font-style: italic;
+    margin: 0.25em 0;
+    padding: 0.35em 40px;
+    line-height: 1.8em;
+    position: relative;
+    color: gray;
+}
+
+blockquote:before {
+    display: block;
+    padding-left: 10px;
+    content: "\201C";
+    font-size: 3em;
+    position: absolute;
+    left: -3vh;
+    top: 3vh;
+    color: gray;
+}
+
+blockquote cite {
+    color: #999999;
+    font-size: 0.6em;
+    display: block;
+    margin-top: 5px;
+}
+
+blockquote cite:before {
+    content: "\2014 \2009";
+}
+
+.symbol-btn {
+    position: fixed;
+    bottom: 25vh;
+    left: 60vw;
+}
+
