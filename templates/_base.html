@@ -20,7 +20,8 @@
 
             <br><br>
             {% if message %}
-            <div class='message'>{{ message }}</div>
+            <div class='message'>
+                <p>{{ message }}</p></div>
             {% endif %}
         </div>
 
@@ -36,6 +37,12 @@
             }
             const goBack = () => {
                 window.history.back();
+            }
+            const iconTransform = (x, id=None) => {
+                x.classList.toggle('change');
+                if(id) {
+                    toggleForm(id)
+                }
             }
         </script>
         {% block script %}{% endblock %}

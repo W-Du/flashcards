@@ -4,7 +4,7 @@ p.intro {
 }
 
 .content h1 {
-    font-size: 3em;
+    font-size: min(3em, 7vh);
     font-style: oblique;
     padding: 0 0 5vh 0;
 }
@@ -12,7 +12,7 @@ p.intro {
 .quotation {
     width: 90%;
     position: relative;
-    padding-left: 20px;
+    padding-left: 2vw;
 }
 
 blockquote {

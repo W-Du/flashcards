@@ -3,12 +3,13 @@
     height: min(300px, 30vh);
     perspective: 1000px; /* Adjust perspective to control the 3D effect */
     cursor: pointer;
-    position: relative;
-    top: -25vh;
+    position: absolute;
+    top: 25vh;
+    left: 10vw;
     transform-style: preserve-3d;
     transition: transform 0.6s ease;
     text-align: center;
-    margin: 30px;
+    margin: 30px 0;
   }
   
   .card h2 {

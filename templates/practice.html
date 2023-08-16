@@ -1,20 +1,19 @@
 {% extends "_menu.html" %}
 
 
-{% block styles %}
+{% block styles2 %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flashcard-flip.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
+
 {% endblock %}
 
 
-{% block menu %}
+{% block title2 %}
 <h1>Practice</h1>
+{% endblock %}
 
-<nav>
-    <a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
-    {% else %} href="/guest" 
-    {% endif %}>Home</a>
-</nav>
+
+{% block content2 %}
 
 {% if cur_word %}
 <div class="card" id="toggle-word">
@@ -22,16 +21,17 @@
         <h2 id="word"> {{ cur_word.word}} </h2>
     </div>
     <div class="back" style="border-color: {{ color }}">
-        <p>Meaning:</p>
         <h3>{{ cur_word.description }}</h3>
     </div>
 </div>
 {% else %}
-<p>no word</p>
+<div class='message'>
+    <p>Something went wrong, please try again</p>
+</div>
 {% endif %}
 
 
-<form method="POST"
+<form method="POST" class="form-practice"
 {% if current_user.is_authenticated %} action="/user/{{ user.username }}/word-priority"
 {% else %} action="/guest/word-priority"
 {% endif %}>
@@ -40,18 +40,25 @@
     {% else %} value="{{ cur_word.word }}"
     {% endif %}>
     <input type="hidden", name="cur_index", value="{{ cur_word_idx }}">
-    <input type="checkbox" name="action" id='not_remember' value="not_remember">Do not have a clue</button>
-    <input type="checkbox" name="action" id='remember' value="remember">I got this</button>
-    <button type="submit">Next</button>
+    <label class="label-checkbox">
+        <input type="checkbox" name="action" class="form-checkbox" id='not_remember' value="not_remember">
+        <p id="no-label">Do not have a clue</p>
+    </label>
+    <label class="label-checkbox">
+        <input type="checkbox" name="action" class="form-checkbox" id='remember' value="remember">
+        <p id="yes-label">I got this</p>
+    </label>
+    <!-- <button type="submit" class="form-button-icon">Prev</button> -->
+    <button type="submit" class="form-button-icon">Next</button>
 </form>
 
-<div id="not_remember_text" style="display: none;">
-    <p style="color:green">This word will come up again</p>
+<!-- <div class="form-message" id="not_remember_text" style="display: none;">
+    <p>This word will come up again</p>
 </div>
 
-<div id="remember_text" style="display: none;">
-    <p style="color:green">You learnt this word, it will not be shown to you for a while</p>
-</div>
+<div class="form-message" id="remember_text" style="display: none;">
+    <p>You learnt this word, it will not be shown to you for a while</p>
+</div> -->
 
 
 
@@ -63,26 +70,26 @@
         flashcard.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0)';
     })
 
-    document.getElementById('not_remember').addEventListener('click', ()=>{
-        toggleText('not_remember', 'not_remember_text');
+    const checkboxNotRemember = document.getElementById('not_remember')
+    const checkboxRemember = document.getElementById('remember')
+
+    const labelNo = document.getElementById('no-label');
+    const labelYes = document.getElementById('yes-label');
+
+    checkboxNotRemember.addEventListener('click', ()=>{
+        labelNo.textContent = checkboxNotRemember.checked? 'This word will come back again' : 'Do not have a clue'
+        labelNo.style.color = checkboxNotRemember.checked? 'darkgreen' : 'black'
         disableCheckbox('not_remember', 'remember');
+        textDisable(checkboxRemember, labelYes);
     })
 
-    document.getElementById('remember').addEventListener('click', ()=>{
-        toggleText('remember', 'remember_text');
+    checkboxRemember.addEventListener('click', ()=>{
+        labelYes.textContent = checkboxRemember.checked? 'You learnt this word, it will not be shown to you for a while' : 'I got this'
+        labelYes.style.color = checkboxRemember.checked? 'darkgreen' : 'black'
         disableCheckbox('remember', 'not_remember');
+        textDisable(checkboxNotRemember, labelNo);
     })
-
-    const toggleText = (checkboxId, textId) =>{
-        const checkbox = document.getElementById(checkboxId)
-        const text = document.getElementById(textId)
-        if (checkbox.checked == true){
-            text.style.display = 'block'
-        } else {
-            text.style.display = 'none'
-        }
-    }
-
+ 
     const disableCheckbox = (id1, id2) => {
         const checkbox1 = document.getElementById(id1);
         const checkbox2 = document.getElementById(id2);
@@ -90,6 +97,14 @@
             checkbox2.disabled = true
         } else {
             checkbox2.disabled = false
+        }
+    }
+
+    const textDisable = (checkbox, label) => {
+        if (checkbox.disabled) {
+            label.style.color = '#808080';
+        } else {
+            label.style.color = 'black';
         }
     }
 </script>

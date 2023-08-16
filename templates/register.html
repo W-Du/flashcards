@@ -27,21 +27,21 @@
         {{ form.email.label(class='form-label')  }}<br>
         {{ form.email(class='form-input') }}<br>
         {% for error in form.email.errors %}
-        <span style="color:red">[{{ error }}]</span>
+        <span class="error">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>
         {{ form.password.label(class='form-label')  }}<br>
         {{ form.password(class='form-input') }}<br>
         {% for error in form.password.errors %}
-        <span style="color:red">[{{ error }}]</span>
+        <span class="error">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>
         {{ form.password2.label(class='form-label')  }}<br>
         {{ form.password2(class='form-input') }}<br>
         {% for error in form.password2.errors %}
-        <span style="color:red">[{{ error }}]</span>
+        <span class="error">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>

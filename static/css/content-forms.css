@@ -1,60 +1,55 @@
-.links {
-    display: grid;
-    grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
-    grid-template-rows: auto;
-    padding-bottom: 10vh;
-    position: relative;
-    top: 10vh;
-} 
-
-.links a {
-    color: black;
-    margin: 10px;
-}
-
 .hidden-form {
     height: max-content;
     min-height: 50vh;
+}
+
+.hidden-form-small {
+    height: max-content;
+    min-height: 20vh;
+    padding: 1vh 0 7vh 0;
 }
 
 .form-jinja, .form-html {
     width: 80%;
     position: relative;
     left: 10%;
-    top: 20px;
+    top: 2vh;
 }
 
-.form-title, h3.profile-opt, .toggle-title {
+.form-title, .profile-opt, .toggle-title {
     color: darkgray;
-    padding-bottom: 20px;
+    padding: 2vh 0 3vh 0;
     z-index: 1;
-    font-size: 14pt;
+    font-size: max(2.5vh, 9pt);
     font-weight: 800;
 }
 
+h4.toggle-title {
+    font-size: max(2vh, 9pt);
+}
+
 .form-jinja div, .from-html div {
-    padding-bottom: 20px;
+    padding-bottom: 2vh;
 }
 
 .form-label {
-    font-size: 12px;
+    font-size: min(10pt, 2vh);
     width: 15vh;
     padding-right: 2vh;
     text-align: left;
-    vertical-align: top;
+    vertical-align: middle;
     display: inline-block;
-    padding-bottom: 5px;
 }
 
-.form-input, .form-textarea {
-    width: min(50vh, 80%);
-    border-radius: 5px;
+.form-input, .form-textarea, .form-select {
+    width: 22vw;
+    border-radius: 1vh;
     box-shadow: none;
     border: lightgray solid 1px;
-    font-size: 16px;
+    font-size: min(12pt, 2vh);
 }
 
-.form-input {
+.form-input, .form-select {
     height: 5vh;
 }
 
@@ -65,24 +60,24 @@
 
 .form-button, .form-link {
     height: 5vh;
-    width: 50vh;
+    width: 22vw;
     box-shadow: none;
     outline: none;
     border: none;
-    border-radius: 5px;
-    font-size: 14px;
+    border-radius: 1vh;
+    font-size: min(11pt, 2vh);
     text-align: center;
 }
 
 .form-button {
     background-color: black;
     color: grey;
-    margin-top: 30px;
+    margin-top: 3vh;
 }
 
 .form-link a {
     display: block;
-    margin: 20px;
+    margin: 2vh;
     color:black;
     text-decoration: none;
 }
@@ -98,18 +93,13 @@ input.form-link {
 a.profile-opt {
     color: darkgray;
     display: block;
-    padding-bottom: 20px;
-    font-size: 14pt;
+    padding-bottom: 3vh;
+    font-size: max(2.5vh, 9pt);
     font-weight: 800;
     text-decoration: none;
 }
 
-.form-input:focus {
-    border: darkgreen solid 1px;
-    outline: none;
-}
-
-.form-textarea:focus {
+.form-input:focus, .form-textarea:focus {
     border: darkgreen solid 1px;
     outline: none;
 }
@@ -118,11 +108,7 @@ a.profile-opt {
     color: white;
 }
 
-.form-link a:hover {
-    text-decoration: underline;
-}
-
-input.form-link:hover {
+.form-link a:hover, input.form-link:hover {
     text-decoration: underline;
 }
 
@@ -131,7 +117,7 @@ a.profile-opt:hover, .toggle-title:hover {
     text-decoration: underline;
 }
 
-.profile-opt:before, .toggle-title:before {
+.profile-opt::before, .toggle-title::before {
     display: inline-block;
     color: darkgray;
     padding: 0 1vh 0.5vh 0;
@@ -140,4 +126,75 @@ a.profile-opt:hover, .toggle-title:hover {
     vertical-align: middle;
 }
 
+h3.change, h4.change {
+    color: black;
+}
 
+h3.change::before, h4.change::before {
+    content: '\25B6';
+    transform: translate(-33%, 0) rotate(90deg);
+}
+
+
+.form-practice {
+    display: block;
+    height: min-content;
+    position: absolute;
+    top: 65vh;
+    left: 10vw;
+}
+
+.form-checkbox {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 14px;
+    height: 14px;
+    border: 0.15em solid currentColor;
+    border-radius: 0.15em;
+    margin-right: 1vh;
+    transform: translateY(0.075em);
+}
+
+.form-checkbox:checked {
+    background-color: darkgreen;
+}
+
+.form-checkbox:disabled {
+    color: grey;
+}
+
+.label-checkbox p {
+    font-size: min(11pt, 2vh);
+    margin-right: 2vh;
+    display: inline-block;
+}
+
+.label-checkbox {
+    display: block;
+    margin-bottom: 1vh;
+}
+
+.form-button-icon {
+    display: block;
+    margin: 3vh 0 0 0;
+    padding-bottom: 1vh;
+    font-size: min(14pt, 2vh);
+    box-shadow: none;
+    border: none;
+    background-color: white;
+}
+
+.form-button-icon:hover {
+    text-decoration: underline;
+    transform: translate(2%, 0);
+}
+
+.form-button-icon::after {
+    display: inline-block;
+    padding-left: 1vh;
+    content: '\2192';
+    font-size: min(14pt, 2vh);
+}
