@@ -1,67 +1,102 @@
-{% extends "_base.html" %}
+{% extends "_menu.html" %}
 
-{% block content %}
 
+{% block styles2 %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-home.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-general.css') }}">
+
+{% endblock %}
+
+
+{% block title2 %}
+<h1>Setting</h1>
+{% endblock %}
+
+
+{% block content2 %}
 <h1>{{ user.username }}'s Setting</h1>
 
-<nav><a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
-    {% else %} href = '/guest'
-    {% endif %}
-    >Back</a></nav>
-
-
-<h2>Overview</h2>
+<!-- personal info -->
+{% if current_user.is_authenticated %}
+<h3 class='toggle-title change' onclick="iconTransform(this, 'person-info')">Personal Information</h3>
+<div class="person-info" id="person-info">
+    <div class="align-box1">
+        <p>Username: </p>
+        <p>Email: </p>
+    </div>
+    <div class="align-box2">
+        <p>{{ user.username }}</p>
+        <p>{{ user.email }}</p>
+    </div>
+</div>
+{% else %}
+<h3 class='toggle-title change' onclick="iconTransform(this, 'remark')">Remarks</h3>
+<div class="remark" id="remark">
+    <p>You are exploring this app as a guest.<br>
+        Some flashcards have been added for you. <br>
+        you can add more into the default list or create your own list <br>
+        But your interaction with the app will not be saved. 
+    </p><br>
+    <a href="/register">Register an Account</a>
+</div>
+{% endif %}
 
 <!-- list -->
-<h3>My lists</h3>
-{% if user.lists | length > 0 %}
-{% for l in user.lists %}
-<p>
-    <a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/lists/{{ l.id }}"
-    {% else %} href="/guest/lists/{{ l.id }}"
-    {% endif %}
-    >{{ l.listname }}</a>
-    &emsp; has {{ l.words | length }} words
-</p>
-{% endfor %}
-{% else %}
-<p>You have no list yet. Create one with form below</p>
-{% endif %}
-<br>
-
-
-<form id='list' 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/setting"
-{% else %} action="/guest/setting"
-{% endif %}
-method='POST'>
-
-    {{ formList.hidden_tag() }}
-    <input type="hidden" name="form_id" value="list">
-    <p>
-        {{ formList.listname.label }}<br>
-        {{ formList.listname(size=32) }}<br>
-        {% for error in formList.listname.errors %}
-        <span style="color:red">[{{ error }}]</span>
+<h3 class='toggle-title' id="toggle-info" onclick="iconTransform(this, 'lists')">My lists</h3>
+<div class='lists' id="lists" style="display: none;">
+    {% if user.lists | length > 0 %}
+    <div class="align-box1">
+        {% for l in user.lists %}
+        <p><a 
+            {% if current_user.is_authenticated %} href="/user/{{ user.username }}/lists/{{ l.id }}"
+            {% else %} href="/guest/lists/{{ l.id }}"
+            {% endif %}
+            >{{l.listname }}</a>
+        </p>
+    {% endfor %}
+    </div>
+    <div class="align-box2">
+        {% for l in user.lists %}
+        <p>has {{l.words | length }} flashcards</p>
         {% endfor %}
-    </p>
-    <p>
-        {{ formList.submit() }}
-    </p>
-</form>
-<br><br>
+    </div>
+    
+    
+    {% else %}
+        <p>You have no list yet. Create one with form below</p>
+    {% endif %}
+
+    <div class="hidden-form-small">
+        <h4 class='toggle-title' id="toggle-form" onclick="iconTransform(this, 'add-list')">Add a new List</h3>
+        <form id='add-list' style="display: none" class="form-jinja" method='POST'
+        {% if current_user.is_authenticated %} action="/user/{{ user.username }}/setting"
+        {% else %} action="/guest/setting"
+        {% endif %}>
+            {{ formList.hidden_tag() }}
+            <input type="hidden" name="form_id" value="list">
+            <div>
+                {{ formList.listname.label(class='form-label')}}
+                {{ formList.listname(class='form-input') }}
+                {% for error in formList.listname.errors %}
+                <br>
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                <div class="form-label"></div>
+                {{ formList.submit(class='form-button') }}
+            </div>
+        </form>
+    </div>
+</div>
 
 
-<h3>I have {{ user.words | length }} flashcards. </h3>
+<a class="profile-opt"
+{% if current_user.is_authenticated %} href='/user/{{ user.username }}/flashcards'
+{% else %} href="/guest/flashcards"
+{% endif %}>I have {{ user.words | length }} flashcards in total</a><br>
 
-
-<a 
-{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards"
-{% else %} href="/guest/flashcards" 
-{% endif %}
->See all my flashcards</a>
 
 
 {% endblock %}

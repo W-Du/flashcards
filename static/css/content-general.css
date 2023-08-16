@@ -1,0 +1,58 @@
+.links {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
+    grid-template-rows: auto;
+    padding-bottom: 10vh;
+    position: relative;
+    top: 10vh;
+} 
+
+.links a {
+    color: black;
+    margin: 1.5vh;
+}
+
+.links a:hover {
+    color: darkgreen;
+}
+
+.lists, .person-info {
+    padding: 0 0 2vh 5vh;
+}
+
+.lists a {
+    color: black;
+    text-decoration: none;
+}
+
+.lists p, .person-info p {
+    font-size: min(11pt, 2vh);
+    padding: 1vh 0 1vh 0;
+}
+
+.lists a:hover {
+    text-decoration: underline;
+}
+
+.remark a {
+    text-decoration: none;
+    color: black;
+}
+
+.remark a:hover {
+    text-decoration: underline;
+}
+
+
+
+.align-box1, .align-box2 {
+    display: inline-block;
+    width: max-content;
+    height: min-content;
+    min-width: 10vh;
+    padding: 0 2vh 0 1vh;
+}
+
+.align-box1 {
+    border-left: 1px darkgray solid;
+}

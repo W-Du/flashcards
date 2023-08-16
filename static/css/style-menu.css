@@ -17,7 +17,7 @@
 }
 
 .nav {
-    margin: 15vh 0 20px 7vh;
+    margin: 15vh 0 20px 3vw;
 }
 
 nav a {
@@ -34,7 +34,7 @@ nav a {
 .menu-icon {
     position: relative;
     top: 7vh;
-    left: 7vh;
+    left: 3vw;
     align-items: right;
     margin-right: 5vh;
     z-index: 1;
@@ -44,13 +44,14 @@ nav a {
 .bar1, .bar2, .bar3 {
     width: 35px;
     height: 5px;
-    background-color: #333;
+    background-color: darkgray;
     margin: 6px 0;
     transition: 0.4s;
 }
 
 .change .bar1 {
     transform: translate(0, 11px) rotate(-45deg);
+    background-color: #333;
 }
 
 .change .bar2 {
@@ -59,6 +60,7 @@ nav a {
 
 .change .bar3 {
     transform: translate(0, -11px) rotate(45deg);
+    background-color: #333;
 }
 
 

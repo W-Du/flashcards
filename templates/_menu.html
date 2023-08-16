@@ -24,7 +24,7 @@
 {% block content2 %}{% endblock %}
 <div class="center">
 
-    <div class="menu-icon" onclick="iconTransform(this)">
+    <div id='menu-icon' class="menu-icon" onclick="iconTransform(this, 'menu')">
       <div class="bar1"></div>
       <div class="bar2"></div>
       <div class="bar3"></div>
@@ -51,14 +51,4 @@
 {% endblock %}
 
 
-{% block script %}
-<script>
-    // document.getElementById('toggle-menu').addEventListener('click', () => {
-    //     toggleForm('menu');
-    // })
-    const iconTransform = x => {
-      x.classList.toggle("change");
-      toggleForm('menu')
-    }
-</script>
-{% endblock %}
+{% block script %}{% endblock %}

@@ -4,20 +4,6 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.message {
-    width: 30%;
-    text-align: center;
-    padding: 10px;
-    background-color: #fff4c7;
-    margin: auto;
-    border-radius: 20px;
-    border: solid 2px #ffd154;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    font-size: 14px;
-    color: #595959;
-}
-
 .title {
     position: fixed;
     width: 40%;
@@ -26,7 +12,7 @@
 }
 
 .title h1 {
-    font-size: 5em;
+    font-size: min(5em, 8vw);
     overflow: hidden;
     position: absolute;
     bottom: 20vh;
@@ -47,6 +33,8 @@
     width: 70%;
     color: darkgray;
     line-height: 2.5vh;
+    position: relative;
+    left: 2vh;
 }
 
 .remark h4 {
@@ -61,8 +49,33 @@
     padding: 7vh 5vh;
 }
 
-.remark:hover {
-    color: darkred;
+.message {
+    width: 50%;
+    padding: 10px;
+    text-align: center;
+    margin-top: 30px;
+    border-radius: 20px;
+    border: solid 1.5px red;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: min(12pt, 3vh);
+    color: red;
+    position: relative;
+    left: 10%;
+}
+
+.message p::before, .message p::after {
+    display: inline-block;
+    content: "!!";
+    font-size: min(14pt, 3.5vh);
+    color: red;
+    padding: 0 5px 0 5px;
+}
+
+.error {
+    color: red;
+    padding: 15px 0 0 0;
+    font-size: 1.5vh;
 }
 
 

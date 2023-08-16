@@ -2,6 +2,8 @@
 
 {% block styles2 %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-general.css') }}">
+
 {% endblock %}
 
 {% block title2 %}
@@ -11,7 +13,7 @@
 
 {% block content2 %}
 <div class="hidden-form">
-    <h3 class='toggle-title' id="toggle-card">Add a new Flashcard</h3>
+    <h3 class='toggle-title' id="toggle-card" onclick="iconTransform(this, 'add-card')">Add a new Flashcard</h3>
     <form id="add-card" class="form-jinja"
     {% if not display %} style="display:none" {% endif %} 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"
@@ -56,9 +58,4 @@
     {% endfor %}
 </div>
 
-<script>
-    document.getElementById('toggle-card').addEventListener('click', () => {
-        toggleForm('add-card');
-    })
-</script>
 {% endblock %}
