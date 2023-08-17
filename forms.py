@@ -21,18 +21,18 @@ class LoginForm(FlaskForm):
 class AddFlashcardForm(FlaskForm):
     word = StringField('New Word', validators=[DataRequired()])
     description = TextAreaField('Meanings & Sample Sentences', validators=[DataRequired()])
-    addToList = SelectMultipleField('Add to List', coerce=int)
+    # addToList = SelectMultipleField('Add to List', coerce=int)
     submit = SubmitField('Add new word')
 
-    def __init__(self, *args, **kwargs):
-        super(AddFlashcardForm, self).__init__(*args, **kwargs)
-        if current_user.is_authenticated:
-            self.addToList.choices = [(l.id, l.listname) for l in current_user.lists]            
-        else:
-            guest = session.get('guest', None)
-            if guest:
-                self.addToList.choices = [(l.id, l.listname) for l in guest.lists]
-                self.addToList.validators =[DataRequired()]
+    # def __init__(self, *args, **kwargs):
+    #     super(AddFlashcardForm, self).__init__(*args, **kwargs)
+    #     if current_user.is_authenticated:
+    #         self.addToList.choices = [(l.id, l.listname) for l in current_user.lists]            
+    #     else:
+    #         guest = session.get('guest', None)
+    #         if guest:
+    #             self.addToList.choices = [(l.id, l.listname) for l in guest.lists]
+    #             self.addToList.validators =[DataRequired()]
 
 class AddListForm(FlaskForm):
     listname = StringField('Name of list', validators=[DataRequired()])
@@ -53,17 +53,17 @@ class UpdateListForm(FlaskForm):
 class UpdateWordForm(FlaskForm):
     word= StringField('Word', validators=[DataRequired()])
     description = TextAreaField('Meaning', validators=[DataRequired()])
-    Inlists = SelectMultipleField('In lists', coerce=int)
+    # Inlists = SelectMultipleField('In lists', coerce=int)
     submit = SubmitField('Update')
 
-    def __init__(self, *args, **kwargs):
-        super(UpdateWordForm, self).__init__(*args, **kwargs)
-        if current_user.is_authenticated:
-            self.Inlists.choices = [(l.id, l.listname) for l in current_user.lists]
-        else:
-            guest = session.get('guest', None)
-            if guest:
-                self.Inlists.choices = [(l.id, l.listname) for l in guest.lists]
+    # def __init__(self, *args, **kwargs):
+    #     super(UpdateWordForm, self).__init__(*args, **kwargs)
+    #     if current_user.is_authenticated:
+    #         self.Inlists.choices = [(l.id, l.listname) for l in current_user.lists]
+    #     else:
+    #         guest = session.get('guest', None)
+    #         if guest:
+    #             self.Inlists.choices = [(l.id, l.listname) for l in guest.lists]
         
 
 # class BulkEditForm(FlaskForm):

@@ -51,7 +51,7 @@ def updateList(id):
     msg1 = request.args.get('message')
     words = lst.words
     form = UpdateListForm()
-    formCard = AddFlashcardForm(addToList=[int(id)])
+    formCard = AddFlashcardForm()
     if form.validate_on_submit():
         new_name = escape(form.listname.data)
         if new_name != lst.listname:
@@ -87,7 +87,7 @@ def deleteList(id):
 def flashcardsG():
     guest = retrieveGuest()
     lst_idx = request.form.get('lst_id')
-    form = AddFlashcardForm(addToList=[0])
+    form = AddFlashcardForm()
     display = request.args.get('display')
     if form.validate_on_submit():
         try:
@@ -97,8 +97,11 @@ def flashcardsG():
                         return redirect(url_for('guests.updateList', id=lst_idx, message='exist'))
                     msg = 'you already have this word in flashcards'
                     return render_template('flashcards.html', words=guest.words, form=form, user=guest, display=True, message=msg)
+            selected_lists = request.form.getlist('list')   
+            if not selected_lists:
+                msg = 'choose a list to add this flashcard'
+                return render_template('flashcards.html', words=guest.words, form=form, user=guest, display=True, message=msg)
             new_word = GuestWord(word=escape(form.word.data), description=escape(form.description.data))
-            selected_lists = form.addToList.data    
             if not isinstance(selected_lists, list):
                 selected_lists = [selected_lists]
             for lstId in selected_lists:
@@ -107,6 +110,7 @@ def flashcardsG():
                 guest.updateWords()
             form.word.data = None
             form.description.data = None
+            # print(new_word.lists)
             if lst_idx:
                 return redirect(url_for('guests.updateList', id=int(lst_idx)))
             return render_template('flashcards.html', words=guest.words, form=form, user=guest)
@@ -128,13 +132,13 @@ def updateFlashcardG(word):
     word_inlists_idx = []
     for l in wordObj.lists:
         word_inlists_idx.append(l.id)
-    form = UpdateWordForm(Inlists=word_inlists_idx, description = wordObj.description)
+    form = UpdateWordForm(description = wordObj.description)
     if form.validate_on_submit():
         new_description = escape(form.description.data)
         new_word = escape(form.word.data)
-        new_lists_idx = form.Inlists.data
-        if not isinstance(new_lists_idx, list):
-            new_lists_idx = [new_lists_idx]
+        new_lists_idx = [int(idx) for idx in request.form.getlist('inlist')]
+        # if not isinstance(new_lists_idx, list):
+        #     new_lists_idx = [new_lists_idx]
         if new_description != wordObj.description or new_word != wordObj.word or word_inlists_idx != new_lists_idx:
             wordObj.word = new_word
             wordObj.description = new_description

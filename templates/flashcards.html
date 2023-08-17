@@ -37,14 +37,21 @@
             {% endfor %}
         </div>
         <div>
-            {{ form.addToList.label(class='form-label') }}
-            {{ form.addToList(class='form-select') }}<br>
+            <label class="form-label">Add to List(s)</label>
+            <div class="form-multi-select">
+                {% for l in user.lists %}
+                <div class="multi-opt">
+                    <input type="checkbox" name='list' id='{{ l.listname }}' value="{{ l.id }}"
+                    {% if not user.is_authenticated and l.listname == 'default' %} checked {% endif %}>
+                    <label for="{{ l.listname }}">{{ l.listname }}</label>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         <div>
             <p class="form-label"></p>
             {{ form.submit(class='form-button') }}
         </div>
-
     </form>
 </div>
 

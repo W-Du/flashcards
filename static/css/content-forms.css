@@ -47,6 +47,13 @@ h4.toggle-title {
     box-shadow: none;
     border: lightgray solid 1px;
     font-size: min(12pt, 2vh);
+    padding: 1vh;
+}
+
+.form-multi-select {
+    width: 22vw;
+    font-size: min(12pt, 2vh);
+    display: inline-block;
 }
 
 .form-input, .form-select {
@@ -197,4 +204,32 @@ h3.change::before, h4.change::before {
     padding-left: 1vh;
     content: '\2192';
     font-size: min(14pt, 2vh);
+}
+
+
+/* multi-select field customized */
+.multi-opt input[type="checkbox"] {
+    display: none;
+}
+
+.multi-opt label {
+    display: inline-block;
+    padding: 1vh 2vh;
+    border: 1px solid lightgrey;
+    margin: 1px 10px 1px 1px;
+    border-radius: 1vh;
+    cursor: pointer;
+    color: grey;
+    font-size: min(12pt, 2vh);
+}
+
+.multi-opt input[type="checkbox"]:checked + label {
+    border: 2px solid darkgreen;
+    color: black;
+    margin: 0 9px 0 0;
+}
+
+.multi-opt {
+    display: inline-block;
+    width: max-content;
 }
