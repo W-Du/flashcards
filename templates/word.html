@@ -42,12 +42,16 @@
             {% endfor %}
         </div>
         <div>
-            {{ form.Inlists.label(class='form-label') }}
-            {{ form.Inlists() }}
-            {% for error in form.Inlists.errors %}
-            <br>
-            <span class="error">[{{ error }}]</span>
-            {% endfor %}
+            <label class="form-label">In List(s)</label>
+            <div class="form-multi-select">
+                {% for l in user.lists %}
+                <div class="multi-opt">
+                    <input type="checkbox" name='inlist' id='{{ l.listname }}' value="{{ l.id }}"
+                    {% if l in word.lists %} checked {% endif %}>
+                    <label for="{{ l.listname }}">{{ l.listname }}</label>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         <div> 
             <p class='form-label'></p>
