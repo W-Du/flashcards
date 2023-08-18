@@ -19,7 +19,7 @@
 
 <!-- personal info -->
 {% if current_user.is_authenticated %}
-<h3 class='toggle-title change' onclick="iconTransform(this, 'person-info')">Personal Information</h3>
+<h3 class='toggle-title change' onclick="iconTransform(this, ['person-info'])">Personal Information</h3>
 <div class="person-info" id="person-info">
     <div class="align-box1">
         <p>Username: </p>
@@ -31,7 +31,7 @@
     </div>
 </div>
 {% else %}
-<h3 class='toggle-title change' onclick="iconTransform(this, 'remark')">Remarks</h3>
+<h3 class='toggle-title change' onclick="iconTransform(this, ['remark'])">Remarks</h3>
 <div class="remark" id="remark">
     <p>You are exploring this app as a guest.<br>
         Some flashcards have been added for you. <br>
@@ -43,7 +43,7 @@
 {% endif %}
 
 <!-- list -->
-<h3 class='toggle-title' id="toggle-info" onclick="iconTransform(this, 'lists')">My lists</h3>
+<h3 class='toggle-title' id="toggle-info" onclick="iconTransform(this, ['lists'])">My Decks</h3>
 <div class='lists' id="lists" style="display: none;">
     {% if user.lists | length > 0 %}
     <div class="align-box1">
@@ -64,11 +64,11 @@
     
     
     {% else %}
-        <p>You have no list yet. Create one with form below</p>
+        <p>You don't have any deck yet. Create one with form below</p>
     {% endif %}
 
     <div class="hidden-form-small">
-        <h4 class='toggle-title' id="toggle-form" onclick="iconTransform(this, 'add-list')">Add a new List</h3>
+        <h4 class='toggle-title' id="toggle-form" onclick="iconTransform(this, ['add-list'])">Add a New Deck</h3>
         <form id='add-list' style="display: none" class="form-jinja" method='POST'
         {% if current_user.is_authenticated %} action="/user/{{ user.username }}/setting"
         {% else %} action="/guest/setting"

@@ -42,7 +42,7 @@
             {% endfor %}
         </div>
         <div>
-            <label class="form-label">In List(s)</label>
+            <label class="form-label">In Deck(s)</label>
             <div class="form-multi-select">
                 {% for l in user.lists %}
                 <div class="multi-opt">
@@ -99,9 +99,9 @@
     title.addEventListener('click', () => {
         formOpen = !formOpen;
         title.textContent = formOpen ? 'Back' : 'Edit Flashcard';
-        toggleForm('edit-flashcard');
-        toggleForm('delete-flashcard');
-        toggleForm('toggle-word');
+        toggleForm(['edit-flashcard']);
+        toggleForm(['delete-flashcard']);
+        toggleForm(['toggle-word']);
     })
 
 </script>

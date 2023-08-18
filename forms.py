@@ -35,8 +35,8 @@ class AddFlashcardForm(FlaskForm):
     #             self.addToList.validators =[DataRequired()]
 
 class AddListForm(FlaskForm):
-    listname = StringField('Name of list', validators=[DataRequired()])
-    submit = SubmitField('Add New List')
+    listname = StringField('Name of deck', validators=[DataRequired()])
+    submit = SubmitField('Add New Deck')
 
 class ChangeDailyGoalForm(FlaskForm):
     goal = IntegerField('Daily Goal', validators=[DataRequired()])
@@ -47,7 +47,7 @@ class ChangeDailyGoalForm(FlaskForm):
 #     not_remember = SubmitField('Do not have a clue')
 
 class UpdateListForm(FlaskForm):
-    listname = StringField('Name of List', validators=[DataRequired()])
+    listname = StringField('Name of deck', validators=[DataRequired()])
     submit = SubmitField('Update')
 
 class UpdateWordForm(FlaskForm):

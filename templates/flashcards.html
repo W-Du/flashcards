@@ -13,7 +13,7 @@
 
 {% block content2 %}
 <div class="hidden-form">
-    <h3 class='toggle-title' id="toggle-card" onclick="iconTransform(this, 'add-card')">Add a new Flashcard</h3>
+    <h3 class='toggle-title' id="toggle-card" onclick="iconTransform(this, ['add-card'])">Add a new Flashcard</h3>
     <form id="add-card" class="form-jinja"
     {% if not display %} style="display:none" {% endif %} 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards"
@@ -37,7 +37,7 @@
             {% endfor %}
         </div>
         <div>
-            <label class="form-label">Add to List(s)</label>
+            <label class="form-label">Add to Deck(s)</label>
             <div class="form-multi-select">
                 {% for l in user.lists %}
                 <div class="multi-opt">

@@ -24,7 +24,7 @@
     <h4>Please noted:</h4>
     <p>You are exploring this app as a guest.<br>
         Some flashcards have been added for you. <br>
-        you can add, update, and practice with your flashcards and lists. <br>
+        you can add, update, and practice with your flashcards and decks. <br>
         But your interaction with the app will not be saved. 
     </p><br>
 </div>
@@ -38,7 +38,7 @@
 {% endif %}>There are {{ user.words | length }} flashcards in total</a><br>
 
 <div class="hidden-form">
-    <h3 class='toggle-title' id="toggle-form" onclick="iconTransform(this, 'form-practice')">Practice</h3>
+    <h3 class='toggle-title' id="toggle-form" onclick="iconTransform(this, ['form-practice'])">Practice</h3>
     <form class="form-jinja" id="form-practice" style="display: none;"
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start"
     {% else %} action="/guest/practice/start"
@@ -53,7 +53,7 @@
             <label class='form-label' for="list">Select a list</label>
             <select class='form-select' id="list" name="list">
                 {% for list in user.lists %}
-                <option value="{{ list.id }}">{{ list.listname }} has {{ list.words | length }} flashcards</option>
+                <option value="{{ list.id }}">{{ list.listname }} - {{ list.words | length }} flashcards</option>
                 {% endfor %}
                 <option value="all" selected>All</option>
             </select>

@@ -1,138 +1,154 @@
-{% extends '_toggle.html' %}
-{% block toggle %}
-
-<h1>Vocabulary List - {{ lst.listname }}</h1>
-
-<nav>
-    <a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/setting"
-    {% else %} href="/guest/setting"
-    {% endif %}>Setting</a>
-
-    <form method="POST" 
-    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start?list={{ lst. id }}"
-    {% else %} action="/guest/practice/start?list={{ lst.id }}"
-    {% endif %}>
-        <input type="hidden" name="list" value="{{ lst.id }}">
-        <input type="submit" value="practice list {{ lst.listname }}">
-    </form>
-</nav><br><br>
+{% extends '_menu.html' %}
 
 
-<button id="toggle-form">A new name for the list?</button>
-<form id="change-list-name" style="display: none" method="POST" 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/{{ lst.id }}"
-{% else %} action="/guest/lists/{{ lst.id }}"
+{% block styles2 %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-general.css') }}">
+{% endblock %}
+
+
+{% block title2 %}
+<h1>Deck of Flashcards</h1>
+{% endblock %}
+
+
+{% block content2 %}
+<h1>Deck - {{ lst.listname }}</h1>
+
+<form method="POST"
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start?list={{ lst. id }}"
+{% else %} action="/guest/practice/start?list={{ lst.id }}"
 {% endif %}>
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.listname.label }}
-        {{ form.listname(size=32, value = lst.listname)}}
-    </p>
-    <p> {{ form.submit() }} </p>
-</form>
-
-
-{% if not current_user.is_authenticated and lst.listname != 'default' %}
-<form id="delete-list" style="display:none" method="POST" 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/delete/{{ lst.id }}"
-{% else %} action="/guest/lists/delete/{{ lst.id }}"
-{% endif %}>
-    {% if lst.words | length > 0 %}
-    <input type="checkbox" name="delete-all">
-    <label for="delete-all">Delete all words in this list</label>
-    {% endif %}
-    <input type="submit" value="Delete List">
-</form>
-{% endif %}
-
-<br><br>
-<h3>Add Flashcards</h3>
-<button id="add-word">Create a new Flashcard to {{ lst.listname }}</button>
-<form id="new-flashcard" style="display: none;" method="POST" 
-{% if current_user.is_authenticated %} action='/user/{{ user.username }}/flashcards'
-{% else %} action="/guest/flashcards"
-{% endif %}>
-    <input type="hidden" name="lst_id" value="{{ lst.id }}">
-    {{ formCard.hidden_tag() }}
-    <p>
-        {{ formCard.word.label }}<br>
-        {{ formCard.word(size = 64) }}<br>
-        {% for error in formCard.word.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ formCard.description.label }}<br>
-        {{ formCard.description(size = 128) }}<br>
-        {% for error in formCard.description.errors %}
-        <span style="color:red">[{{ error }}]</span>
-        {% endfor %}
-    </p>
+    <input type="hidden" name="list" value="{{ lst.id }}">
     <div>
-        <label class="form-label">Add to List(s)</label>
-        <div class="form-multi-select">
-            {% for l in user.lists %}
-            <div class="multi-opt">
-                <input type="checkbox" name='list' id='{{ l.listname }}' value="{{ l.id }}"
-                {% if l.listname == lst.listname %} checked {% endif %}>
-                <label for="{{ l.listname }}">{{ l.listname }}</label>
-            </div>
-            {% endfor %}
-        </div>
+        <input type="submit" class="form-button-im" value="Practice Deck {{ lst.listname }}">
     </div>
-    <p>
-        {{ formCard.submit() }}
-
 </form>
 
-<br>
-<form method="POST" 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
-{% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
-{% endif %}>
-    <input type="hidden" name="action" value="add to">
-    <input type="submit" value="Add existing flashcars to {{ lst.listname }}">
-</form>
-<!-- <a href="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}">Add existing flashcars to {{ lst.listname }} </a> -->
 
 
-
-<h3>Words in {{ lst.listname }}</h3>
-
-<div>
-{% for w in words %}
-<a 
-{% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}"
-{% else %} href="/guest/flashcards/{{ w.word }}?list={{ lst.id }}"
-{% endif %}>{{ w.word }}</a>
-{% endfor %}
+<!-- words in list -->
+<h3 class="toggle-title change" onclick="iconTransform(this, ['words-in-list'])">Words in {{ lst.listname }}</h3>
+<div id="words-in-list" class="links">
+    {% for w in words %}
+    <a 
+    {% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}"
+    {% else %} href="/guest/flashcards/{{ w.word }}?list={{ lst.id }}"
+    {% endif %}>{{ w.word }}</a>
+    {% endfor %}
 </div>
 
 
-<form id="bulk-remove" method="POST" 
-{% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
-{% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
-{% endif %}>
-    <input type="hidden" name="action" value="remove from">
-    <input type="submit" value="Remove flashcards from {{ lst.listname }}">
-</form>
+<!-- FORM_1: change list name and delete -->
+<div class="hidden-form-small">
+    <h3 class='toggle-title' id="toggle-form" onclick="iconTransform(this, ['change-list-name','delete-list'])">Edit Deck</h3>
+    <form id="change-list-name" class="form-jinja" style="display: none" method="POST" 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/{{ lst.id }}"
+    {% else %} action="/guest/lists/{{ lst.id }}"
+    {% endif %}>
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.listname.label(class='form-label') }}
+            {{ form.listname(size=32, value = lst.listname, class='form-input')}}
+        </div>
+        <div> 
+            <p class="form-label"></p>
+            {{ form.submit(class='form-button') }} 
+        </div>
+    </form>
+
+    <!-- delete list as a button-->
+    {% if not current_user.is_authenticated and lst.listname != 'default' %}
+    <form id="delete-list" class='form-html' style="display:none" method="POST" 
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/delete/{{ lst.id }}"
+    {% else %} action="/guest/lists/delete/{{ lst.id }}"
+    {% endif %}>
+        {% if lst.words | length > 0 %}
+        <div>
+            <p class="form-label"></p>
+            <label class="label-checkbox">
+                <input type="checkbox" name="delete-all" class="form-checkbox">
+                <p>Remove this deck and all of its flashcards</p>
+            </label>
+        </div>
+        {% endif %}
+        <div>
+            <p class="form-label"></p>
+            <input class="form-link" type="submit" value="Delete Deck">
+        </div>
+    </form>
+    {% endif %}
+</div>
 
 
+<!-- FORM 2: ADD | BULK ADD | BULK REMOVE -->
+<div class="hidden-form-small">
+    <h3 class='toggle-title' onclick="iconTransform(this, ['new-flashcard', 'add-exist', 'bulk-remove', 'remarks'])">Add or Remove Flashcards</h3>
+    <div class="remark" id="remarks">
+        <p>Flashcards can be added to the deck by being created new.<br>
+            Or the one(s) existing in other deck(s) could be duplicated into this deck.<br>
+            You can delete this deck but still retaining flashcards or removing them altogether.
+        </p>
+    </div>
+    
+    <!-- add existing -->
+    <form class="form-html icon" method="POST" id="add-exist" style="display:none"
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
+    {% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
+    {% endif %}>
+        <input type="hidden" name="action" value="add to">
+        <input type="submit" class="form-link-left" value="Add existing flashcars to {{ lst.listname }}">
+    </form>
 
-<script>
-    document.getElementById('toggle-form').addEventListener('click', () => {
-        toggleForm('change-list-name');
-        toggleForm('delete-list');
-    })
-    document.getElementById('add-word').addEventListener('click', ()=>{
-        toggleForm('new-flashcard');
-    })
-    // document.getElementById('remove').addEventListener('click', ()=>{
-    //     toggleForm('bulk-remove');
-    //     toggleForm('cards-link');
-    // })
-</script>
+    <!-- removing bulk -->
+    <form id="bulk-remove" class="form-html icon" method="POST" style='display: none;'
+    {% if current_user.is_authenticated %} action="/user/{{ user.username }}/flashcards/bulk/{{ lst.id }}"
+    {% else %} action="/guest/flashcards/bulk/{{ lst.id }}"
+    {% endif %}>
+        <input type="hidden" name="action" value="remove from">
+        <input type="submit" class="form-link-left" value="Remove flashcards from {{ lst.listname }}">
+    </form>
 
+    <!-- create new -->
+    <form id="new-flashcard" style="display: none;" method="POST" class="form-jinja"
+    {% if current_user.is_authenticated %} action='/user/{{ user.username }}/flashcards'
+    {% else %} action="/guest/flashcards"
+    {% endif %}>
+        <input type="hidden" name="lst_id" value="{{ lst.id }}">
+        {{ formCard.hidden_tag() }}
+        <div>
+            {{ formCard.word.label(class='form-label') }}
+            {{ formCard.word(class='form-input') }}
+            {% for error in formCard.word.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ formCard.description.label(class='form-label') }}
+            {{ formCard.description(class='form-textarea') }}
+            {% for error in formCard.description.errors %}
+            <br>
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            <label class="form-label">Add to Deck(s)</label>
+            <div class="form-multi-select">
+                {% for l in user.lists %}
+                <div class="multi-opt">
+                    <input type="checkbox" name='list' id='{{ l.listname }}' value="{{ l.id }}"
+                    {% if l.listname == lst.listname %} checked {% endif %}>
+                    <label for="{{ l.listname }}">{{ l.listname }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <p class="form-label"></p>
+            {{ formCard.submit(class='form-button') }}
+        </div>
+    </form>
+</div>
 
 {% endblock %}

@@ -1,3 +1,8 @@
+h3 {
+    font-size: max(2.5vh, 9pt);
+    font-weight: 800;
+}
+
 .links {
     display: grid;
     grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
@@ -56,3 +61,49 @@
 .align-box1 {
     border-left: 1px darkgray solid;
 }
+
+
+#words-in-list {
+    padding-bottom: 2vh;
+    position: relative;
+    top: 0;
+}
+
+.words {
+    margin: 3vh 0 0 0;
+    width: 80%;
+    position: relative;
+    left: 10%;
+}
+
+.review-line {
+    width: 80%;
+    margin-bottom: 2vh;
+    display: grid;
+    grid-gap: 1vh;
+    grid-template-columns: max-content minmax(6vw, max-content) auto;
+    text-align: left;
+}
+
+.align-circle {
+    display: inline-block;
+    width: 2.5vh;
+    height: 2.5vh;
+    border-radius: 50%;
+}
+
+.word-box, .descp-box {
+    display: inline-block;
+    padding: 1vh, 1vh, 2vh, 0;
+    font-size: min(12pt, 2vh);
+}
+
+.strong-p {
+    font-weight: 600;
+}
+
+.descp-box {
+    color: #4a4a4a;
+}
+
+

@@ -247,13 +247,12 @@ def practice_cont():
 
 @guest_bp.route('/guest/practice/review/<index>', methods=['GET', 'POST'])
 def practice_review(index):
-    guest = session.get('guest', None)
-    if not guest:
-        raise Exception("no guest found")
+    guest = retrieveGuest()
+    words = session.get('words_review_7', set())
     if request.method == 'POST':
         session['words_review_7'] = set()
         return redirect(url_for('guests.practice', index=index))
-    return render_template('practice_review.html', user=guest, cur_word_idx=index)
+    return render_template('practice_review.html', user=guest, cur_word_idx=index, words=words)
 
 @guest_bp.route('/guest/word-priority', methods=['POST'])
 def word_priority():
