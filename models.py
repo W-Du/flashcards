@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
 from datetime import datetime
-from functions import priorityChange
+from functions import priorityChange, getColorByPriority
 
 list_user = db.Table(
     'list_user',
@@ -68,6 +68,9 @@ class Word(db.Model):
         if pdiff:
             self.priority += pdiff
         self.last_visit = datetime.today()
+
+    def getColor(self):
+        return getColorByPriority(self.priority)
         
 
     

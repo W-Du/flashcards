@@ -1,33 +1,45 @@
-{% extends "_base.html" %}
+{% extends "_menu.html" %}
 
-{% block content %}
+{% block styles2 %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-general.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-forms.css') }}">
+{% endblock %}
 
+
+{% block title2 %}
 <h1>Practice Review</h1>
+{% endblock %}
 
-<nav>
-    <a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
-    {% else %} href="/guest"
-    {% endif %}>Home</a>
-</nav>
 
-<p>A concise review session of every 7 words you just learnt</p><br>
+{% block content2 %}
+
+<div class="remark">
+    <p>A concise review session of every 7 words you just learnt</p><br>
+</div>
+
+<h3>Words in Review</h3>
 
 {% if words %}
 {% for word in words %}
-<p><strong>{{ word.word }}: </strong> {{ word.description }}</p>
-{% endfor %}
-{% else %}
-{% for word in session['words_review_7'] %}
-<p><strong>{{ word.word }}: </strong> {{ word.description }}</p>
+<div class="words">
+    <div class="review-line">
+        <div class="align-circle" style='background-color: {{ word.getColor()}}'></div>
+        <div class="word-box">
+            <p class="strong-p">{{ word.word }}</p>
+        </div>
+        <div class="descp-box">
+            <p>{{ word.description }}</p>
+        </div>
+    </div>
+</div>
 {% endfor %}
 {% endif %}
 
-<form method="POST"
+<form method="POST" class="form-html"
 {% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/review/{{ cur_word_idx }}"
 {% else %} action="/guest/practice/review/{{ cur_word_idx }}"
 {% endif %}>
-    <input type="submit" value="Continue">
+    <input type="submit" class="form-button-im" value="Continue">
 </form>
 
 {% endblock %}

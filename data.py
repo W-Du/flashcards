@@ -1,3 +1,5 @@
+from functions import getColorByPriority
+
 class GuestWord:
     def __init__(self, word, description = None):
         self.word = word
@@ -31,6 +33,9 @@ class GuestWord:
 
     # def __repr__(self):
     #     return self.word + '\n' + self.description
+
+    def getColor(self):
+        return getColorByPriority(self.priority)
 
     def __repr__(self):
         return self.word

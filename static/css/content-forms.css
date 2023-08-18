@@ -5,15 +5,14 @@
 
 .hidden-form-small {
     height: max-content;
-    min-height: 20vh;
-    padding: 1vh 0 7vh 0;
+    padding: 1vh 0 2vh 0;
 }
 
 .form-jinja, .form-html {
     width: 80%;
     position: relative;
     left: 10%;
-    top: 2vh;
+    margin-top: 2vh
 }
 
 .form-title, .profile-opt, .toggle-title {
@@ -34,8 +33,8 @@ h4.toggle-title {
 
 .form-label {
     font-size: min(10pt, 2vh);
-    width: 15vh;
-    padding-right: 2vh;
+    width: 8vw;
+    padding-right: 1vw;
     text-align: left;
     vertical-align: middle;
     display: inline-block;
@@ -48,6 +47,7 @@ h4.toggle-title {
     border: lightgray solid 1px;
     font-size: min(12pt, 2vh);
     padding: 1vh;
+    margin-bottom: 1.5vh;
 }
 
 .form-multi-select {
@@ -65,7 +65,7 @@ h4.toggle-title {
     overflow: scroll;
 }
 
-.form-button, .form-link {
+.form-button, .form-link, .form-button-im, .form-link-left {
     height: 5vh;
     width: 22vw;
     box-shadow: none;
@@ -76,10 +76,9 @@ h4.toggle-title {
     text-align: center;
 }
 
-.form-button {
+.form-button, .form-button-im {
     background-color: black;
     color: grey;
-    margin-top: 3vh;
 }
 
 .form-link a {
@@ -89,7 +88,23 @@ h4.toggle-title {
     text-decoration: none;
 }
 
-input.form-link {
+input.form-link-left {
+    text-align: left;
+    font-size: min(12pt, 2vh);
+}
+
+
+.form-button-im {
+    background-color: darkred;
+    width: 80%;
+    margin: 5vh 0 2vh 0;
+}
+
+.form-button-im:hover {
+    color: white;
+}
+
+input.form-link, input.form-link-left {
     color: black;
     border: none;
     box-shadow: none;
@@ -115,7 +130,7 @@ a.profile-opt {
     color: white;
 }
 
-.form-link a:hover, input.form-link:hover {
+.form-link a:hover, input.form-link:hover, input.form-link-left:hover {
     text-decoration: underline;
 }
 
@@ -124,7 +139,7 @@ a.profile-opt:hover, .toggle-title:hover {
     text-decoration: underline;
 }
 
-.profile-opt::before, .toggle-title::before {
+.profile-opt::before, .toggle-title::before, .icon::before {
     display: inline-block;
     color: darkgray;
     padding: 0 1vh 0.5vh 0;
@@ -180,8 +195,8 @@ h3.change::before, h4.change::before {
 }
 
 .label-checkbox {
-    display: block;
-    margin-bottom: 1vh;
+    display: inline-block;
+    margin-bottom: 2vh;
 }
 
 .form-button-icon {
@@ -232,4 +247,47 @@ h3.change::before, h4.change::before {
 .multi-opt {
     display: inline-block;
     width: max-content;
+}
+
+/* form-select */
+
+.form-select {     
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    appearance: none;
+}
+
+.form-select {
+    background-image:
+      linear-gradient(45deg, transparent 50%, gray 50%),
+      linear-gradient(135deg, gray 50%, transparent 50%),
+      linear-gradient(to right, lightgray, lightgray);
+    background-position:
+      calc(100% - 20px) calc(1em + 2px),
+      calc(100% - 15px) calc(1em + 2px),
+      calc(100% - 2.5em) 0.5em;
+    background-size:
+      5px 5px,
+      5px 5px,
+      1px 1.5em;
+    background-repeat: no-repeat;
+}
+
+.form-select:focus {
+    background-image:
+      linear-gradient(45deg, darkgreen 50%, transparent 50%),
+      linear-gradient(135deg, transparent 50%, darkgreen 50%),
+      linear-gradient(to right, lightgray, lightgray);
+    background-position:
+      calc(100% - 15px) 1em,
+      calc(100% - 20px) 1em,
+      calc(100% - 2.5em) 0.5em;
+    background-size:
+      5px 5px,
+      5px 5px,
+      1px 1.5em;
+    background-repeat: no-repeat;
+    border-color: darkgreen;
+    outline: 0;
 }
