@@ -64,6 +64,8 @@ def practice(username, cur_word_idx=0):
             word_id = int(words_again.pop(0))
             cur_word = Word.query.get(word_id)
         else:
+            session['complete'] = True
+
             return redirect(url_for('user.completeGoal', username=username))
     elif len(words_review_7) == 7:
         return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
@@ -107,6 +109,7 @@ def startPractice(username):
         session['words_review_7'] = set()
     if session.get('words_again') is None:
         session['words_again'] = []
+    session['complete'] = False
     return redirect(url_for('user.practice', username=username))
 
 
@@ -157,12 +160,23 @@ def word_priority(username):
 @login_required
 @check_username_match
 def completeGoal(username):
-    session.pop('words_practice', None)
-    session.pop('words_again', None)
-    session.pop('list_in_practice_id', None)
-    session.pop('goal', None)
-    session.pop('words_review_7', None)
-    return render_template('goalComplete.html', user=current_user)    
+    if session.get('complete') == True:
+        session.pop('words_practice', None)
+        session.pop('words_again', None)
+        session.pop('list_in_practice_id', None)
+        session.pop('goal', None)
+        session.pop('words_review_7', None)
+        session.pop('complete', None)
+        try:
+            current_user.completeNum += 1
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        return render_template('goalComplete.html', user=current_user)  
+    elif not session.get('words_practice'):
+        return redirect(url_for('user.profile', username=username))
+    else:
+        return redirect(url_for('user.practice', username=username))
 
 @user_bp.route('/user/<username>/setting', methods=['GET','POST'])
 @login_required

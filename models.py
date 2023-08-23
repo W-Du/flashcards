@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
     daily_goal = db.Column(db.Integer, nullable=True)
+    completeNum = db.Column(db.Integer, default=0)
     lists = db.relationship('List', secondary=list_user, back_populates='users', cascade='all, delete')
     words = db.relationship('Word', secondary=word_user, back_populates='users', cascade='all, delete')
 

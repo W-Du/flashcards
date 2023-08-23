@@ -29,14 +29,20 @@
         <script>
             const toggleForm = (formIdArr) => {
                 formIdArr.forEach(formId => {
-                    const form = document.getElementById(formId);
-                    if (form.style.display === 'none'){
+                    if (!(formId instanceof Array)) {
+                        formId = [formId, false]
+                    }
+                    const form = document.getElementById(formId[0]);
+                    if (form.style.display === 'none' && formId[1]){
+                        form.style.display = 'grid'
+                    } else if (form.style.display === 'none' && !formId[1]) {
                         form.style.display = 'block'
                     } else {
                         form.style.display = 'none'
                     }
                 })
             }
+
             const goBack = () => {
                 window.history.back();
             }

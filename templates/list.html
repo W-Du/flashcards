@@ -28,8 +28,8 @@
 
 
 <!-- words in list -->
-<h3 class="toggle-title change" onclick="iconTransform(this, ['words-in-list'])">Words in {{ lst.listname }}</h3>
-<div id="words-in-list" class="links">
+<h3 class="toggle-title change" onclick="iconTransform(this, [['words-in-list', true]])">Words in {{ lst.listname }}</h3>
+<div id="words-in-list" class="grid links">
     {% for w in words %}
     <a 
     {% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}?list={{ lst.id }}"
