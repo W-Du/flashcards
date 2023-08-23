@@ -6,5 +6,6 @@ DB_flashcards.db
 templates/setting_archive.html
 templates/temp.css
 templates/_toggle.html
+templates/addCard.html
 flask_session/
 

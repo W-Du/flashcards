@@ -1,20 +1,85 @@
+p.intro {
+    font-size: 1.8em;
+    line-height: 2em;
+}
+
+.content h1 {
+    font-size: min(3em, 7vh);
+    font-style: oblique;
+    padding: 0 0 5vh 0;
+    text-transform: capitalize;
+}
+
+.quotation {
+    width: 90%;
+    position: relative;
+    padding-left: 2vw;
+}
+
+blockquote {
+    font-size: 1.5em;
+    font-style: italic;
+    margin: 0.25em 0;
+    padding: 0.35em 40px;
+    line-height: 1.8em;
+    position: relative;
+    color: gray;
+}
+
+blockquote:before {
+    display: block;
+    padding-left: 10px;
+    content: "\201C";
+    font-size: 3em;
+    position: absolute;
+    left: -3vh;
+    top: 3vh;
+    color: gray;
+}
+
+blockquote cite {
+    color: #999999;
+    font-size: 0.6em;
+    display: block;
+    margin-top: 5px;
+}
+
+blockquote cite:before {
+    content: "\2014 \2009";
+}
+
+.symbol-btn {
+    position: fixed;
+    bottom: 25vh;
+    left: 60vw;
+}
+
+
+
+
+
 h3 {
     font-size: max(2.5vh, 9pt);
     font-weight: 800;
 }
 
-.links {
+.grid {
     display: grid;
-    grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) );
+    grid-template-columns: repeat(auto-fit, minmax(min-content, 125px));
     grid-template-rows: auto;
-    padding-bottom: 10vh;
-    position: relative;
-    top: 10vh;
+    margin: 1vh 0 1vh 0;
 } 
 
-.links a {
+.links {
+    position: relative;
+    top: 9vh;
+}
+
+.links a, .label-checkbox p {
     color: black;
     margin: 1.5vh;
+    font-size: min(3vh, 12pt);
+    width: max-content;
 }
 
 .links a:hover {
@@ -49,7 +114,6 @@ h3 {
 }
 
 
-
 .align-box1, .align-box2 {
     display: inline-block;
     width: max-content;
@@ -78,7 +142,7 @@ h3 {
 
 .review-line {
     width: 80%;
-    margin-bottom: 2vh;
+    margin-bottom: 1vh;
     display: grid;
     grid-gap: 1vh;
     grid-template-columns: max-content minmax(6vw, max-content) auto;
@@ -106,4 +170,38 @@ h3 {
     color: #4a4a4a;
 }
 
+.deck-name {
+    font-size: min(14pt, 4vh);
+    font-style: italic;
+    font-weight: 500;
+    color: darkgray;
+}
+
+span.large-font {
+    font-size: min(20pt, 6vh);
+    font-style: italic;
+    font-weight: 600;
+    vertical-align: baseline;
+    color: darkolivegreen;
+    padding: 0 1vh;
+}
+
+.center h2 {
+    font-size: min(14pt, 4vh);
+    color: darkgray;
+    padding: 5vh 0;
+}
+
+.center {
+    text-align: center;
+    margin: 9vh 5vh 0 5vh;
+}
+
+.center a {
+   color: darkgray; 
+}
+
+.center a:hover {
+    color: black;
+}
 

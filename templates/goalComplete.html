@@ -1,17 +1,26 @@
 {% extends "_base.html" %}
 
-{% block content %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content-general.css') }}">
+{% endblock %}
+
+
+{% block title %}
 <h1>Goal Completed</h1>
-
-<nav>
-    <a 
-    {% if current_user.is_authenticated %} href="/user/{{ user.username }}"
-    {% else %} href="/guest"
-    {% endif %}>Home</a>
-</nav>
-
-<p> You have completed your goal</p>
+{% endblock %}
 
 
+{% block content %}
+
+<div class="center">
+    <h1> You have reached your goal</h1>
+    {% if current_user.is_authenticated %}
+    <h2>You now have in total <span class="large-font">{{ current_user.completeNum }}</span> sessions completed.</h2>
+    <a href="/user/{{ user.username }}">Home</a>
+    {% else %}
+    <a href="/guest">Home</a>
+    {% endif %}
+</div>
 
 {% endblock %}

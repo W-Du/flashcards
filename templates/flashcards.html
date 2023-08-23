@@ -56,7 +56,7 @@
 </div>
 
 <!--each flashcard-->
-<div class="links">
+<div class="links grid">
     {% for w in words %}
     <a
     {% if current_user.is_authenticated %} href="/user/{{ user.username }}/flashcards/{{ w.id }}"
