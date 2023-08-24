@@ -23,7 +23,7 @@ def check_username_match(func):
             return redirect(url_for('login.login'))
         return func(username, *args, **kwargs)
     return wrapper
-
+ 
 
 @user_bp.route('/user/<username>')
 @login_required
@@ -37,7 +37,188 @@ def profile(username):
         for w in current_user.words:
             w.updatePriorityTime()
         db.session.commit()
+        print('update priority')
     return render_template('profile.html', user=current_user)
+
+@user_bp.route('/user/<username>/setting', methods=['GET','POST'])
+@login_required
+@check_username_match
+def setting(username):
+    formList = AddListForm()
+    formGoal = ChangeDailyGoalForm()
+    form_id = request.form.get('form_id')
+
+    if form_id == 'list':
+        if formList.validate_on_submit():
+            for l in current_user.lists:
+                if l.listname == formList.listname.data:
+                    msg=f'There is already a list callec {formList.listname.data}'
+                    return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal, message=msg)
+            new_list = List(listname=escape(formList.listname.data))
+            if new_list:
+                db.session.add(new_list)
+                new_list.users.append(current_user)
+                current_user.lists.append(new_list)
+                db.session.commit()
+                formList.listname.data = None
+                return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal)
+            else:
+                msg = 'Could not create a new list'
+                return render_template('setting.html', user=current_user, formList=formList, formGoal = formGoal, message=msg)
+    elif form_id =='goal':
+        if formGoal.validate_on_submit():
+            current_user.daily_goal = int(formGoal.goal.data)
+            db.session.commit()
+            if current_user.daily_goal == int(formGoal.goal.data):
+                print('correct')
+                formGoal = ChangeDailyGoalForm(formdata=None)
+                return render_template('setting.html', user=current_user, formList = formList, formGoal = formGoal)
+            else:
+                msg = 'something went wrong, daily goal not updated'
+                return render_template('setting.html', user=user, formList=formList, formGoal = formGoal, message=msg)
+    return render_template('setting.html', user=current_user, formList = formList, formGoal = formGoal)
+
+
+### lists
+@user_bp.route('/user/<username>/lists/<id>',methods=['GET','POST'])
+@login_required
+@check_username_match
+def updateList(username, id):
+    lst = List.query.get(int(id))
+    message = request.args.get('message')
+    words = lst.words
+    form = UpdateListForm()
+    formCard = AddFlashcardForm()
+    if form.validate_on_submit():
+        new_name = escape(form.listname.data)
+        if new_name != lst.listname:
+            lst.listname = new_name
+            db.session.commit()
+    if message:
+        msg='you already have this flashcard'
+        return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard, message=msg)
+    return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard)
+
+@user_bp.route('/user/<username>/lists/delete/<id>', methods=['POST'])
+@login_required
+@check_username_match
+def deleteList(username, id):
+    lst_to_delete = List.query.get(int(id))
+    keep = request.form.get('delete-all')
+    print(keep)
+    try:
+        if not keep:
+            current_user.lists.remove(lst_to_delete)
+        else:
+            for w in lst_to_delete.words:
+                db.session.delete(w)
+            db.session.delete(lst_to_delete)
+        db.session.commit()
+    except Exception as e:
+        print(str(e))
+    return redirect(url_for('user.setting', username=username))
+
+
+## flashcards
+@user_bp.route('/user/<username>/flashcards', methods=['GET', 'POST'])
+@login_required
+@check_username_match
+def flashcards(username):
+    form = AddFlashcardForm()
+    lst_idx = request.form.get('lst_id')
+    display = request.args.get('display')
+    if form.validate_on_submit():
+        try:
+            for w in current_user.words:
+                if w.word == form.word.data:
+                    if lst_idx:
+                        return redirect(url_for('user.updateList', username=username, id=int(lst_idx), message='exist'))
+                    msg = 'you already have this flashcard'
+                    return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display, message=msg)
+            new_word = Word(word=escape(form.word.data), description=escape(form.description.data))
+            selected_lists = request.form.getlist('list')
+            if new_word:
+                db.session.add(new_word)
+                db.session.commit()
+                current_user.words.append(new_word)
+                new_word.users.append(current_user)
+                if selected_lists:
+                    if not isinstance(selected_lists, list):
+                        selected_lists = [int(selected_lists)]
+                    else: 
+                        selected_lists = [int(id) for id in selected_lists]
+                    lists = List.query.filter(List.id.in_(selected_lists)).all()
+                    new_word.lists.extend(lists)
+                    for lst in lists:
+                        lst.words.append(new_word)
+                db.session.commit()
+            processform(form)
+            if lst_idx is not None:
+                return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
+            return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
+        except Exception as e:
+            msg = 'something went wrong: \n' + str(e)
+            return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, message=msg)
+    if lst_idx is not None:
+        return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
+    if display is not None:
+        return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display)
+    return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
+
+@user_bp.route('/user/<username>/flashcards/<id>', methods=['GET','POST'])
+@login_required
+@check_username_match
+def updateFlashcard(username, id):
+    word = Word.query.get(int(id))
+    color = getColorByPriority(word.priority)
+    lst_idx = request.form.get('lst_id') or request.args.get('list')
+    word_inlists_idx = []
+    for l in word.lists:
+        word_inlists_idx.append(l.id)
+    form = UpdateWordForm(description=word.description)
+    if form.validate_on_submit():
+        new_description = escape(form.description.data)
+        new_word = escape(form.word.data)
+        new_lists_idx = [int(idx) for idx in request.form.getlist('inlist')]
+        # if not isinstance(new_lists_idx, list):
+        #     new_lists_idx = [new_lists_idx]
+        if new_description != word.description or new_word != word.word or word_inlists_idx != new_lists_idx:
+            word.word = new_word
+            word.description = new_description
+            try:
+                if word_inlists_idx != new_lists_idx:
+                    idx_remove = []
+                    idx_add = []
+                    for idx in set().union(*[word_inlists_idx, new_lists_idx]):
+                        if idx not in word_inlists_idx:
+                            l = List.query.get(int(idx))
+                            word.lists.append(l)
+                        elif idx not in new_lists_idx:
+                            l = List.query.get(int(idx))
+                            word.lists.remove(l)
+                db.session.commit()
+            except Exception as e:
+                print(str(e))
+    if lst_idx is not None:
+        return render_template('word.html', word=word, user=current_user, form=form, lst_idx=int(lst_idx), color=color)
+    return render_template('word.html', word=word, user=current_user, form=form, color=color)
+
+@user_bp.route('/user/<username>/flashcards/delete/<id>', methods=['POST'])
+@login_required
+@check_username_match
+def deleteFlashcard(username, id):
+    word = Word.query.get(int(id))
+    lst_id = request.form.get('lst_id')
+    try:
+        for l in word.lists:
+            l.words.remove(word)
+        db.session.delete(word)
+        db.session.commit()
+    except Exception as e:
+        print(str(e))
+    if lst_id is not None:
+        return redirect(url_for('user.updateList', username=username, id=int(lst_id)))
+    return redirect(url_for('user.flashcards', username=username))
 
 
 # practice
@@ -53,7 +234,6 @@ def practice(username, cur_word_idx=0):
 
     if cur_word_idx == 0:
         cur_word_idx = request.args.get('index', default=0, type=int)
-
     if cur_word_idx >= length:
         if goal and goal > length:
             session['goal'] = goal - length
@@ -65,7 +245,6 @@ def practice(username, cur_word_idx=0):
             cur_word = Word.query.get(word_id)
         else:
             session['complete'] = True
-
             return redirect(url_for('user.completeGoal', username=username))
     elif len(words_review_7) == 7:
         return redirect(url_for('user.practice_review', username=username, index=cur_word_idx))
@@ -140,11 +319,14 @@ def practice_review(username, index):
 @check_username_match
 def word_priority(username):
     words_again = session.get('words_again', [])
+    direction = request.form.get('direction')
+    cur_index = int(request.form.get('cur_index'))
+    if direction == 'prev':
+        return redirect(url_for('user.practice', username=username, index=cur_index-1))
     try:
         id = int(request.form.get('word_id'))
         word = Word.query.get(id)
         action = request.form.get('action')
-        cur_index = int(request.form.get('cur_index'))
         if action == 'not_remember':
             words_again.append(word.id)
             word.priority += 1
@@ -178,131 +360,8 @@ def completeGoal(username):
     else:
         return redirect(url_for('user.practice', username=username))
 
-@user_bp.route('/user/<username>/setting', methods=['GET','POST'])
-@login_required
-@check_username_match
-def setting(username):
-    formList = AddListForm()
-    formGoal = ChangeDailyGoalForm()
-    form_id = request.form.get('form_id')
 
-    if form_id == 'list':
-        if formList.validate_on_submit():
-            for l in current_user.lists:
-                if l.listname == formList.listname.data:
-                    msg=f'There is already a list callec {formList.listname.data}'
-                    return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal, message=msg)
-            new_list = List(listname=escape(formList.listname.data))
-            if new_list:
-                db.session.add(new_list)
-                new_list.users.append(current_user)
-                current_user.lists.append(new_list)
-                db.session.commit()
-                formList.listname.data = None
-                return render_template('setting.html', user=current_user, formList=formList, formGoal=formGoal)
-            else:
-                msg = 'Could not create a new list'
-                return render_template('setting.html', user=current_user, formList=formList, formGoal = formGoal, message=msg)
-    elif form_id =='goal':
-        if formGoal.validate_on_submit():
-            current_user.daily_goal = int(formGoal.goal.data)
-            db.session.commit()
-            if current_user.daily_goal == int(formGoal.goal.data):
-                print('correct')
-                formGoal = ChangeDailyGoalForm(formdata=None)
-                return render_template('setting.html', user=current_user, formList = formList, formGoal = formGoal)
-            else:
-                msg = 'something went wrong, daily goal not updated'
-                return render_template('setting.html', user=user, formList=formList, formGoal = formGoal, message=msg)
-    return render_template('setting.html', user=current_user, formList = formList, formGoal = formGoal)
-
-@user_bp.route('/user/<username>/lists/<id>',methods=['GET','POST'])
-@login_required
-@check_username_match
-def updateList(username, id):
-    lst = List.query.get(int(id))
-    message = request.args.get('message')
-    words = lst.words
-    form = UpdateListForm()
-    formCard = AddFlashcardForm()
-    if form.validate_on_submit():
-        new_name = escape(form.listname.data)
-        if new_name != lst.listname:
-            lst.listname = new_name
-            db.session.commit()
-    if message:
-        msg='you already have this flashcard'
-        return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard, message=msg)
-    return render_template('list.html', lst=lst, words=words, user=current_user, form=form, formCard=formCard)
-
-@user_bp.route('/user/<username>/lists/delete/<id>', methods=['POST'])
-@login_required
-@check_username_match
-def deleteList(username, id):
-    lst_to_delete = List.query.get(int(id))
-    keep = request.form.get('delete-all')
-    print(keep)
-    try:
-        if not keep:
-            current_user.lists.remove(lst_to_delete)
-        else:
-            for w in lst_to_delete.words:
-                db.session.delete(w)
-            db.session.delete(lst_to_delete)
-        db.session.commit()
-    except Exception as e:
-        print(str(e))
-    return redirect(url_for('user.setting', username=username))
-
-
-@user_bp.route('/user/<username>/flashcards', methods=['GET', 'POST'])
-@login_required
-@check_username_match
-def flashcards(username):
-    form = AddFlashcardForm()
-    lst_idx = request.form.get('lst_id')
-    display = request.args.get('display')
-    if form.validate_on_submit():
-        try:
-            for w in current_user.words:
-                if w.word == form.word.data:
-                    if lst_idx:
-                        return redirect(url_for('user.updateList', username=username, id=int(lst_idx), message='exist'))
-                    msg = 'you already have this flashcard'
-                    return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display, message=msg)
-            new_word = Word(word=escape(form.word.data), description=escape(form.description.data))
-            selected_lists = request.form.getlist('list')
-            # print(selected_lists)
-            if new_word:
-                db.session.add(new_word)
-                db.session.commit()
-                current_user.words.append(new_word)
-                new_word.users.append(current_user)
-                if selected_lists:
-                    if not isinstance(selected_lists, list):
-                        selected_lists = [int(selected_lists)]
-                    else: 
-                        selected_lists = [int(id) for id in selected_lists]
-                    # print(selected_lists)
-                    lists = List.query.filter(List.id.in_(selected_lists)).all()
-                    new_word.lists.extend(lists)
-                    for lst in lists:
-                        lst.words.append(new_word)
-                db.session.commit()
-            processform(form)
-            if lst_idx is not None:
-                return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
-            return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
-        except Exception as e:
-            msg = 'something went wrong: \n' + str(e)
-            return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, message=msg)
-    if lst_idx is not None:
-        return redirect(url_for('user.updateList', username=username, id=int(lst_idx)))
-    if display is not None:
-        return render_template('flashcards.html', words=current_user.words, form=form, user=current_user, display=display)
-    return render_template('flashcards.html', words=current_user.words, form=form, user=current_user)
-
-
+## bulk edit
 @user_bp.route('/user/<username>/flashcards/bulk/<listId>', methods=['GET','POST'])
 @login_required
 @check_username_match
@@ -356,65 +415,6 @@ def bulkEdit(username, listId):
                 print(str(e))
             return redirect(url_for('user.updateList', username=username, id=listId))
     return render_template('flashcards-bulk.html', words_dict=words_dict, lst=lst, user=current_user, action=action)
-
-
-@user_bp.route('/user/<username>/flashcards/<id>', methods=['GET','POST'])
-@login_required
-@check_username_match
-def updateFlashcard(username, id):
-    word = Word.query.get(int(id))
-    color = getColorByPriority(word.priority)
-    lst_idx = request.form.get('lst_id') or request.args.get('list')
-    word_inlists_idx = []
-    for l in word.lists:
-        word_inlists_idx.append(l.id)
-    form = UpdateWordForm(description=word.description)
-    if form.validate_on_submit():
-        new_description = escape(form.description.data)
-        new_word = escape(form.word.data)
-        new_lists_idx = [int(idx) for idx in request.form.getlist('inlist')]
-        # if not isinstance(new_lists_idx, list):
-        #     new_lists_idx = [new_lists_idx]
-        if new_description != word.description or new_word != word.word or word_inlists_idx != new_lists_idx:
-            word.word = new_word
-            word.description = new_description
-            try:
-                if word_inlists_idx != new_lists_idx:
-                    idx_remove = []
-                    idx_add = []
-                    for idx in set().union(*[word_inlists_idx, new_lists_idx]):
-                        if idx not in word_inlists_idx:
-                            l = List.query.get(int(idx))
-                            word.lists.append(l)
-                        elif idx not in new_lists_idx:
-                            l = List.query.get(int(idx))
-                            word.lists.remove(l)
-                db.session.commit()
-            except Exception as e:
-                print(str(e))
-    if lst_idx is not None:
-        return render_template('word.html', word=word, user=current_user, form=form, lst_idx=int(lst_idx), color=color)
-    return render_template('word.html', word=word, user=current_user, form=form, color=color)
-
-
-@user_bp.route('/user/<username>/flashcards/delete/<id>', methods=['POST'])
-@login_required
-@check_username_match
-def deleteFlashcard(username, id):
-    word = Word.query.get(int(id))
-    lst_id = request.form.get('lst_id')
-    try:
-        for l in word.lists:
-            l.words.remove(word)
-        db.session.delete(word)
-        db.session.commit()
-    except Exception as e:
-        print(str(e))
-    if lst_id is not None:
-        return redirect(url_for('user.updateList', username=username, id=int(lst_id)))
-    return redirect(url_for('user.flashcards', username=username))
-    
-
 
 
 # helper method

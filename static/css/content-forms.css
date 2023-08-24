@@ -195,12 +195,18 @@ h3.change::before, h4.change::before {
 }
 
 .label-checkbox {
-    display: inline-block;
+    display: block;
     margin-bottom: 2vh;
 }
 
-.form-button-icon {
-    display: block;
+
+/* two buttons in a form */
+.inline {
+    width: min(450px, 30vw);
+}
+
+.form-button-next, .form-button-prev {
+    display: inline-block;
     margin: 3vh 0 0 0;
     padding-bottom: 1vh;
     font-size: min(14pt, 2vh);
@@ -209,17 +215,30 @@ h3.change::before, h4.change::before {
     background-color: white;
 }
 
-.form-button-icon:hover {
+.form-button-next {
+    position: absolute;
+    right: 0;
+}
+
+.form-button-next:hover, .form-button-prev:hover {
     text-decoration: underline;
     transform: translate(2%, 0);
 }
 
-.form-button-icon::after {
+.form-button-next::after, .form-button-prev:before {
     display: inline-block;
-    padding-left: 1vh;
-    content: '\2192';
+    padding: 0 1vh;
     font-size: min(14pt, 2vh);
 }
+
+.form-button-prev:before {
+    content: '\2190';
+}
+
+.form-button-next::after {
+    content: '\2192';
+}
+
 
 
 /* multi-select field customized */
@@ -249,8 +268,8 @@ h3.change::before, h4.change::before {
     width: max-content;
 }
 
-/* form-select */
 
+/* form-select */
 .form-select {     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
