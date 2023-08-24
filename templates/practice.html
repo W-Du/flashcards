@@ -48,18 +48,22 @@
         <input type="checkbox" name="action" class="form-checkbox" id='remember' value="remember">
         <p id="yes-label">I got this</p>
     </label>
-    <!-- <button type="submit" class="form-button-icon">Prev</button> -->
-    <button type="submit" class="form-button-icon">Next</button>
+    <div class="inline">
+        <button type="submit" name='direction' value='prev' class="form-button-prev"
+        {% if cur_word_idx == 0 %} disabled
+        {% endif %}>Prev</button>
+        <button type="submit" name="direction" value="next" class="form-button-next">Next</button>
+    </div>
 </form>
 
-<!-- <div class="form-message" id="not_remember_text" style="display: none;">
-    <p>This word will come up again</p>
-</div>
 
-<div class="form-message" id="remember_text" style="display: none;">
-    <p>You learnt this word, it will not be shown to you for a while</p>
-</div> -->
-
+<!-- <form method="POST" class="form-practice"
+{% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice"
+{% else %} action="/guest/practice"
+{% endif %}>
+    <input type="hidden", name="cur_index", value="{{ cur_word_idx -1 }}">
+    <button type="submit" class="form-button-prev">Prev</button>
+</form> -->
 
 
 <script>

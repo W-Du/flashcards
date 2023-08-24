@@ -16,6 +16,7 @@ def saveGuestData():
     if not guest:
         session['guest'] = guestData
 
+
 @guest_bp.route('/guest')
 def profile():
     guest = retrieveGuest()
@@ -188,7 +189,6 @@ def practice(cur_word_idx=0):
     
     if cur_word_idx == 0:
         cur_word_idx = request.args.get('index', default=0, type=int)
-
     if cur_word_idx >= length:
         if goal and goal > length:
             session['goal'] = goal - length
@@ -198,6 +198,7 @@ def practice(cur_word_idx=0):
         elif len(words_again) > 0:
             cur_word = words_again.pop(0)
         else:
+            session['complete'] = True
             return redirect(url_for('guests.completeGoal'))
     elif len(words_review_7) == 7:
         return redirect(url_for('guests.practice_review', index=cur_word_idx))
@@ -258,16 +259,18 @@ def practice_review(index):
 def word_priority():
     guest = retrieveGuest()
     words_again = session.get('words_again', [])
+    cur_index = int(request.form.get('cur_index'))
+    direction = request.form.get('direction')
+    if direction == 'prev':
+        return redirect(url_for('guests.practice', index=cur_index-1))
     try:
         w = request.form.get('word_id')
         word = guest.getWord(w)
         action = request.form.get('action')
-        cur_index = int(request.form.get('cur_index'))
         if action == 'not_remember':
             word.priority += 1
             guest.updateWords()
             words_again.append(word)
-            # print(words_again)
             return redirect(url_for('guests.practice', index=cur_index+1))
         elif action=='remember':
             word.priority -= 1  
@@ -279,12 +282,18 @@ def word_priority():
 @guest_bp.route('/guest/practice/goal')
 def completeGoal():
     guest = retrieveGuest()
-    session.pop('words_practice', None)
-    session.pop('words_again', None)
-    session.pop('list_in_practice_id', None)
-    session.pop('goal', None)
-    session.pop('words_review_7', None)
-    return render_template('goalComplete.html', user=guest)   
+    if session.get('complete') == True:
+        session.pop('words_practice', None)
+        session.pop('words_again', None)
+        session.pop('list_in_practice_id', None)
+        session.pop('goal', None)
+        session.pop('words_review_7', None)
+        session.pop('complete', None)
+        return render_template('goalComplete.html', user=guest)   
+    elif session.get('words_practice'):
+        return redirect(url_for('guests.practice'))
+    else: 
+        return redirect(url_for('guests.profile'))
 
 
 ## bulk edit
