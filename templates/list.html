@@ -58,7 +58,7 @@
     </form>
 
     <!-- delete list as a button-->
-    {% if not current_user.is_authenticated and lst.listname != 'default' %}
+    {% if lst.listname != 'default' %}
     <form id="delete-list" class='form-html' style="display:none" method="POST" 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/lists/delete/{{ lst.id }}"
     {% else %} action="/guest/lists/delete/{{ lst.id }}"
@@ -66,7 +66,8 @@
         {% if lst.words | length > 0 %}
         <div>
             <p class="form-label"></p>
-            <label class="label-checkbox">
+
+            <label class="label-checkbox" style="display:inline-block">
                 <input type="checkbox" name="delete-all" class="form-checkbox">
                 <p>Remove this deck and all of its flashcards</p>
             </label>

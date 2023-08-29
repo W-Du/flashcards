@@ -169,14 +169,14 @@ h3.change::before, h4.change::before {
 .form-checkbox {
     appearance: none;
     background-color: #fff;
-    margin: 0;
+    margin: 0 1vh;
+    padding-left: 1vh;
     font: inherit;
     color: currentColor;
     width: 14px;
     height: 14px;
     border: 0.15em solid currentColor;
     border-radius: 0.15em;
-    margin-right: 1vh;
     transform: translateY(0.075em);
 }
 
