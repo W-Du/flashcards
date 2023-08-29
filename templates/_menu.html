@@ -8,6 +8,11 @@
 
 
 {% block title %}
+<div class="go-back">
+    <p onclick="history.back()">Back</p>
+</div>
+
+{% block title2 %}{% endblock %}
 <div class="info">
     <p><strong>
         {% if current_user.is_authenticated %} {{ current_user.username }} | 
@@ -17,12 +22,11 @@
     {% if current_user.is_authenticated %} <em>{{ current_user.email }}</em>
     {% endif %}
 </div>
-{% block title2 %}{% endblock %}
 {% endblock %}
 
 {% block content %}
 {% block content2 %}{% endblock %}
-<div class="center">
+<div class="center-menu">
 
     <div id='menu-icon' class="menu-icon" onclick="iconTransform(this, ['menu'])">
       <div class="bar1"></div>

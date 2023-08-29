@@ -30,7 +30,12 @@
 </div>
 {% endif %}
 
-<a href='' class="profile-opt">You have completed {{ user.completeNum }} practice sessions</a><br>
+
+<h3>You now have in total <span class="large-font">
+    {% if current_user.is_authenticated %} {{ current_user.completeNum }}
+    {% else %} {{ session.get('completeNum') }}
+    {% endif %} </span> 
+    sessions completed.</h3><br>
 
 <a class="profile-opt"
 {% if current_user.is_authenticated %} href='/user/{{ user.username }}/flashcards'
@@ -38,8 +43,8 @@
 {% endif %}>There are {{ user.words | length }} flashcards in total</a><br>
 
 <div class="hidden-form">
-    <h3 class='toggle-title' id="toggle-form" onclick="iconTransform(this, ['form-practice'])">Practice</h3>
-    <form class="form-jinja" id="form-practice" style="display: none;"
+    <h3 class='toggle-title change' id="toggle-form" onclick="iconTransform(this, ['form-practice'])">Practice</h3>
+    <form class="form-jinja" id="form-practice" 
     {% if current_user.is_authenticated %} action="/user/{{ user.username }}/practice/start"
     {% else %} action="/guest/practice/start"
     {% endif %}

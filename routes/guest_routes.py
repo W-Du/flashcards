@@ -71,7 +71,8 @@ def deleteList(id):
     try:
         if not keep:
             defaultLst = guest.getListByName('default')
-            defaultLst.addWords(lst_to_delete.words)
+            for word in lst_to_delete.words:
+                defaultLst.addWord(word)
             guest.removeList(lst_to_delete)
         else:
             guest.removeList(lst_to_delete)
@@ -289,6 +290,7 @@ def completeGoal():
         session.pop('goal', None)
         session.pop('words_review_7', None)
         session.pop('complete', None)
+        session['completeNum'] += 1
         return render_template('goalComplete.html', user=guest)   
     elif session.get('words_practice'):
         return redirect(url_for('guests.practice'))
@@ -359,4 +361,6 @@ def retrieveGuest():
     if not guest:
         print('cannot find guest')
         return redirect(url_for('login.home', message='NoGuest'))
+    if not session.get('completeNum'):
+        session['completeNum'] = 0
     return guest

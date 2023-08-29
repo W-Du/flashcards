@@ -24,8 +24,35 @@
 .info p {
     display: inline-block;
     font-size: 2vh;
-    padding: 7vh 0 0 5vh;
+    position: absolute;
+    bottom: 5vh;
+    left: 7vh
 }
+
+
+.go-back {
+    width: max-content;
+    position: absolute;
+    top: 7vh;
+    left: 5vh
+}
+
+.go-back p::before, .go-back p{
+    display: inline-block;
+    font-size: min(14pt, 2vh);
+    vertical-align: baseline;
+}
+
+.go-back p::before {
+    content: '\2190';
+    padding-right: 1vh;
+}
+
+.go-back p:hover {
+    text-decoration: underline;
+    transform: translate(2%, 0);
+}
+
 
 .remark {
     padding: 1vh 0 1vh 0;

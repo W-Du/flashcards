@@ -28,11 +28,12 @@
         
         <script>
             const toggleForm = (formIdArr) => {
-                formIdArr.forEach(formId => {
-                    if (!(formId instanceof Array)) {
-                        formId = [formId, false]
+                formIdArr.forEach(id => {
+                    if (!(id instanceof Array)) {
+                        formId = [id, false]
                     }
                     const form = document.getElementById(formId[0]);
+                    console.log(form)
                     if (form.style.display === 'none' && formId[1]){
                         form.style.display = 'grid'
                     } else if (form.style.display === 'none' && !formId[1]) {
@@ -42,10 +43,7 @@
                     }
                 })
             }
-
-            const goBack = () => {
-                window.history.back();
-            }
+            
             const iconTransform = (x, id=None) => {
                 x.classList.toggle('change');
                 if(id) {
